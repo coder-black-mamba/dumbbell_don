@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-==&+^d*3_s6)i0u&t(@sqbbu*1d_jt_cwu1$s*)q%-mwiepe5$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -40,7 +40,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
     "debug_toolbar",
+    "users",
+    "classes",
+    "plans",
+    "payments",
+    "reports",
+    "feedback",
+    "core",
 ]
 
 MIDDLEWARE = [
@@ -126,3 +134,10 @@ STATIC_ROOT = BASE_DIR / "static"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+REST_FRAMEWORK = {
+    "COERCE_DECIMAL_TO_STRING": False,
+    "EXCEPTION_HANDLER": "core.utils.custom_exception_handler.custom_exception_handler",
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+}
