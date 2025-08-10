@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from .models import Feedback
+from .serializers import FeedbackSerializer
+from core.utils.BASEModelViewSet import BaseModelViewSet
 
-# Create your views here.
+
+class FeedbackViewSet(BaseModelViewSet):
+    queryset = Feedback.objects.all()
+    serializer_class = FeedbackSerializer
