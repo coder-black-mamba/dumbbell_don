@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
+import os
+# Temporarily disabled Cloudinary storage
+# from cloudinary_storage.storage import MediaCloudinaryStorage
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,14 +27,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-==&+^d*3_s6)i0u&t(@sqbbu*1d_jt_cwu1$s*)q%-mwiepe5$"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True  # Make sure DEBUG is True for development
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "dumbbell-don.vercel.app"]
 
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
+# Temporarily disabled Cloudinary configuration
+# cloudinary.config( 
+#     cloud_name=config("CLOUD_NAME"), 
+#     api_key=config("CLOUDINARY_API_KEY"), 
+#     api_secret=config("CLOUDINARY_API_SECRET"), 
+#     secure=True
+# )
+
+# Media storage settings - using default file system storage for now
+# DEFAULT_FILE_STORAGE="cloudinary_storage.storage.MediaCloudinaryStorage"
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+AUTH_USER_MODEL = "users.User"
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,6 +60,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "debug_toolbar",
+    "cloudinary",
+    "cloudinary_storage",
     "users",
     "classes",
     "plans",

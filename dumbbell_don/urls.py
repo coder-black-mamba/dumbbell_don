@@ -29,6 +29,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("hello/", hello_world),
     path("core/", include("core.urls")),
+    path("api/v1/", include("api.urls")),
 ]  + debug_toolbar_urls()
 
 # customizing default error handlers to return json response instead of html 
