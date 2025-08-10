@@ -1,0 +1,31 @@
+INFO 2025-08-10 17:08:49,675 autoreload Watching for file changes with StatReloader None
+DEBUG 2025-08-10 17:08:49,994 utils (0.003) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default None
+DEBUG 2025-08-10 17:08:49,994 utils (0.003) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default None
+DEBUG 2025-08-10 17:08:49,997 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default None
+DEBUG 2025-08-10 17:08:49,997 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default None
+INFO 2025-08-10 17:09:21,136 autoreload Watching for file changes with StatReloader None
+DEBUG 2025-08-10 17:09:21,497 utils (0.001) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default None
+DEBUG 2025-08-10 17:09:21,497 utils (0.001) 
+            SELECT name, type FROM sqlite_master
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+            ORDER BY name; args=None; alias=default None
+DEBUG 2025-08-10 17:09:21,500 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default None
+DEBUG 2025-08-10 17:09:21,500 utils (0.000) SELECT "django_migrations"."id", "django_migrations"."app", "django_migrations"."name", "django_migrations"."applied" FROM "django_migrations"; args=(); alias=default None
+DEBUG 2025-08-10 17:09:26,182 utils (0.000) SELECT 1 AS "a" FROM "users_user" WHERE "users_user"."username" = 'abu' LIMIT 1; args=(1, 'abu'); alias=default None
+DEBUG 2025-08-10 17:09:26,182 utils (0.000) SELECT 1 AS "a" FROM "users_user" WHERE "users_user"."username" = 'abu' LIMIT 1; args=(1, 'abu'); alias=default None
+DEBUG 2025-08-10 17:09:26,314 utils (0.000) BEGIN; args=None; alias=default None
+DEBUG 2025-08-10 17:09:26,314 utils (0.000) BEGIN; args=None; alias=default None
+DEBUG 2025-08-10 17:09:26,317 utils (0.000) ROLLBACK; args=None; alias=default None
+DEBUG 2025-08-10 17:09:26,317 utils (0.000) ROLLBACK; args=None; alias=default None
+ERROR 2025-08-10 17:09:26,341 log Internal Server Error: /api/v1/auth/users/ None
+ERROR 2025-08-10 17:09:26,342 basehttp "POST /api/v1/auth/users/ HTTP/1.1" 500 76 None
+INFO 2025-08-10 17:09:39,550 autoreload /Users/abusayed/cs/phitron_main/SDT_phitron_assignments/django_final_base/dumbbell_don/dumbbell_don/settings.py changed, reloading. None
