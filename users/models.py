@@ -8,13 +8,16 @@ from .validators import bd_phone_number_validator
 
 
 class User(AbstractUser):
+    MEMBER = 'MEMBER'
+    STAFF = 'STAFF'
+    ADMIN = 'ADMIN'
     ROLE_CHOICES = (
-        ('MEMBER', 'Member'),
-        ('STAFF', 'Staff'),
-        ('ADMIN', 'Admin')
+        (MEMBER, 'Member'),
+        (STAFF, 'Staff'),
+        (ADMIN, 'Admin')
     )
     username = None
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='MEMBER')
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=MEMBER)
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)

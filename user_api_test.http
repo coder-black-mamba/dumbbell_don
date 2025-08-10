@@ -15,7 +15,7 @@ POST http://localhost:8000/api/v1/auth/jwt/create/
 Content-Type: application/json
 
 {
-    "email": "absayed2@gmail.com",
+    "email": "sde.sayed24@gmail.com",
     "password": "Test@12345"
 }
 

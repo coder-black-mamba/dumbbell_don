@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     "reports",
     "feedback",
     "core",
+    "subscriptions",
 ]
 
 MIDDLEWARE = [
@@ -158,7 +159,7 @@ STATIC_ROOT = BASE_DIR / "static"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 REST_FRAMEWORK = {
@@ -166,7 +167,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "COERCE_DECIMAL_TO_STRING": False,
-    "EXCEPTION_HANDLER": "core.utils.custom_exception_handler.custom_exception_handler",
+    # "EXCEPTION_HANDLER": "core.utils.custom_exception_handler.custom_exception_handler",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }
