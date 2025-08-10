@@ -12,8 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
-import os
 from datetime import timedelta
+import os
+import cloudinary
 # Temporarily disabled Cloudinary storage
 # from cloudinary_storage.storage import MediaCloudinaryStorage
 
@@ -37,16 +38,16 @@ INTERNAL_IPS = [
 ]
 
 # Temporarily disabled Cloudinary configuration
-# cloudinary.config( 
-#     cloud_name=config("CLOUD_NAME"), 
-#     api_key=config("CLOUDINARY_API_KEY"), 
-#     api_secret=config("CLOUDINARY_API_SECRET"), 
-#     secure=True
-# )
+cloudinary.config( 
+    cloud_name=config("CLOUD_NAME"), 
+    api_key=config("CLOUDINARY_API_KEY"), 
+    api_secret=config("CLOUDINARY_API_SECRET"), 
+    secure=True
+)
 
 # Media storage settings - using default file system storage for now
-# DEFAULT_FILE_STORAGE="cloudinary_storage.storage.MediaCloudinaryStorage"
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DEFAULT_FILE_STORAGE="cloudinary_storage.storage.MediaCloudinaryStorage"
+# DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 AUTH_USER_MODEL = "users.User"
