@@ -31,6 +31,13 @@ class MembershipReport(BaseReport):
     total_members = models.PositiveIntegerField()
     active_members = models.PositiveIntegerField()
     inactive_members = models.PositiveIntegerField()
+    generated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="generated_membership_reports"
+    )
     related_name = "membership_reports"
 
     def __str__(self):
@@ -41,6 +48,13 @@ class AttendanceReport(BaseReport):
     total_sessions = models.PositiveIntegerField()
     total_attendees = models.PositiveIntegerField()
     average_attendance = models.FloatField()
+    generated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="generated_attendance_reports"
+    )
     related_name = "attendance_reports"
 
     def __str__(self):
@@ -52,6 +66,13 @@ class FeedbackReport(BaseReport):
     average_rating = models.FloatField()
     positive_feedback_count = models.PositiveIntegerField()
     negative_feedback_count = models.PositiveIntegerField()
+    generated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="generated_feedback_reports"
+    )
     related_name = "feedback_reports"
 
     def __str__(self):
