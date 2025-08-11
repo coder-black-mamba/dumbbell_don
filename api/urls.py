@@ -5,7 +5,7 @@ from subscriptions.views import SubscriptionViewSet
 from payments.views import InvoiceViewSet, PaymentViewSet
 from classes.views import FitnessClassViewSet, BookingViewSet, AttendanceViewSet
 from feedback.views import FeedbackViewSet
-
+from reports.views import MembershipReportViewSet, AttendanceReportViewSet, FeedbackReportViewSet
 
 router = DefaultRouter()
 
@@ -17,6 +17,9 @@ router.register("fitness-classes", FitnessClassViewSet,basename="fitness-class")
 router.register("bookings", BookingViewSet,basename="booking")
 router.register("attendances", AttendanceViewSet,basename="attendance")
 router.register("feedbacks", FeedbackViewSet,basename="feedback")
+router.register("membership-reports", MembershipReportViewSet,basename="membership-report")
+router.register("attendance-reports", AttendanceReportViewSet,basename="attendance-report")
+router.register("feedback-reports", FeedbackReportViewSet,basename="feedback-report")
 
 urlpatterns=router.urls
 urlpatterns += [
