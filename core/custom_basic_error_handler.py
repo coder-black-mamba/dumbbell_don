@@ -1,4 +1,4 @@
-
+from django.http import JsonResponse
 # customizing default error handlers to return json response instead of html 
 def custom_handler400(request, exception):
      return JsonResponse({
@@ -42,4 +42,4 @@ def custom_handler500(request):
         "message": "Internal Server Error",
         "errors": {},
         "code": "internal_server_error"
-    }, status=500)
+    }, status=500)  
