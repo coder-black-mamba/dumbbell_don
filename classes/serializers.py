@@ -38,3 +38,5 @@ class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = ['id', 'member', 'status','booked_at','fitness_class'] 
+
+        

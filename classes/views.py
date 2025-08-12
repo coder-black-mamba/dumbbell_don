@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from core.utils.api_response import success_response
 from classes.models import Booking  
+from users.models import User
 
 class FitnessClassViewSet(BaseModelViewSet):
     queryset = FitnessClass.objects.all()
@@ -18,6 +19,8 @@ class BookingViewSet(BaseModelViewSet):
     serializer_class = BookingSerializer
     
     def get_queryset(self):
+        if self.request.user.role == User.ADMIN:
+            return Booking.objects.all()
         return Booking.objects.filter(member=self.request.user)
     
     def perform_create(self, serializer):
@@ -39,4 +42,12 @@ class AttendanceViewSet(BaseModelViewSet):
 def class_schedule(request):
     data=Booking.objects.filter(member=request.user)
     serializer=ScheduleSerializer(data, many=True)
+    return success_response(data=serializer.data)
+
+
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
+def bookings(request):
+    data=Booking.objects.filter(member=request.user)
+    serializer=BookingSerializer(data, many=True)
     return success_response(data=serializer.data)
