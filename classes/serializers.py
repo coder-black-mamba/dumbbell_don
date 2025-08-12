@@ -20,6 +20,7 @@ class AttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attendance
         fields = '__all__'
+        read_only_fields = ['id', 'created_at', 'updated_at','marked_by','marked_at']
     
 class ScheduleInstructorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,4 +40,3 @@ class ScheduleSerializer(serializers.ModelSerializer):
         model = Booking
         fields = ['id', 'member', 'status','booked_at','fitness_class'] 
 
-        

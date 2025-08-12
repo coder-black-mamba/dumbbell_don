@@ -25,3 +25,10 @@ class IsStaffOrAdminAndReadOnly(BasePermission):
 class IsAdminOrStaff(BasePermission):
     def has_permission(self, request, view):
         return request.user and (request.user.role == User.ADMIN or request.user.role == User.STAFF)
+
+
+class IsStuffOrReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return True
+        return request.user and request.user.role == User.STAFF

@@ -32,9 +32,9 @@ class Booking(models.Model):
 
 class Attendance(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE)
-    present = models.BooleanField(default=False)
+    present = models.BooleanField(default=True)
     marked_by = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
     marked_at = models.DateTimeField(auto_now_add=True) 
 
     def __str__(self):
-        return f"{self.marked_by} - {self.booking.member} - {self.booking.fitness_class} - {self.present}"
+        return f"{self.booking.member} - {self.booking.fitness_class} - {self.present}"
