@@ -7,7 +7,7 @@ class FitnessClassViewSet(BaseModelViewSet):
     queryset = FitnessClass.objects.all()
     serializer_class = FitnessClassSerializer
     permission_classes = [IsStaffOrAdminAndReadOnly]
-
+ 
 
 class BookingViewSet(BaseModelViewSet):
     serializer_class = BookingSerializer
