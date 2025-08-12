@@ -1,12 +1,12 @@
 from core.utils.api_response import success_response
 from core.utils.BASEModelViewSet import BaseModelViewSet
 from .models import FitnessClass, Booking, Attendance
-from .serializers import FitnessClassSerializer, BookingSerializer, AttendanceSerializer,ScheduleSerializer
+from .serializers import FitnessClassSerializer, BookingSerializer, AttendanceSerializer,ScheduleSerializer,MemberAttendanceSerializer,MemberBookingSerializer
 from .permissions import IsStaffOrAdminAndReadOnly , IsStuffOrSelfOrReadOnly
 from rest_framework.decorators import permission_classes,api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from classes.models import Booking  
+from classes.models import Booking,Attendance  
 from users.models import User
 
 class FitnessClassViewSet(BaseModelViewSet):
@@ -54,7 +54,18 @@ def class_schedule(request):
 @api_view(['GET'])
 def bookings(request):
     data=Booking.objects.filter(member=request.user)
-    serializer=BookingSerializer(data, many=True)
+    serializer=MemberBookingSerializer(data, many=True)
     return success_response(data=serializer.data)
 
+
+
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
+def show_attendance(request):
+    if request.user.role == User.ADMIN:  
+        data=Attendance.objects.all()
+    else:
+        data=Attendance.objects.filter(booking__member=request.user)
+    serializer=MemberAttendanceSerializer(data, many=True)
+    return success_response(data=serializer.data)
 

@@ -15,6 +15,7 @@ class AttendanceReportViewSet(BaseModelViewSet):
     queryset = AttendanceReport.objects.all()
     serializer_class = AttendanceReportSerializer
     permission_classes = [IsAdminUser]
+    
     def perform_create(self, serializer):
         serializer.save(generated_by=self.request.user)
 

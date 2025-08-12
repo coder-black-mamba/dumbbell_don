@@ -40,3 +40,16 @@ class ScheduleSerializer(serializers.ModelSerializer):
         model = Booking
         fields = ['id', 'member', 'status','booked_at','fitness_class'] 
 
+
+class MemberBookingSerializer(serializers.ModelSerializer):
+    fitness_class = ScheduleFitnessClassSerializer(read_only=True)
+    class Meta:
+        model = Booking
+        fields = ['id', 'member', 'status','booked_at','fitness_class'] 
+
+
+class MemberAttendanceSerializer(serializers.ModelSerializer):
+    booking = MemberBookingSerializer(read_only=True)
+    class Meta:
+        model = Attendance
+        fields = ['id', 'booking', 'present','marked_by','marked_at']
