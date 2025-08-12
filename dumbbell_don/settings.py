@@ -60,7 +60,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "djoser",
     "rest_framework",
+    "rest_framework_simplejwt",
     "debug_toolbar",
     "cloudinary",
     "cloudinary_storage",
@@ -73,6 +75,8 @@ INSTALLED_APPS = [
     "core",
     "subscriptions",
 ]
+
+# SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -183,9 +187,7 @@ DJOSER = {
         'user_create': 'users.serializers.UserCreateSerializer',
         'current_user': 'users.serializers.UserSerializer'
     },
-    'EMAIL': {
-        'activation': 'users.email.CustomActivationEmail',
-    }
+     'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
 }
 
 
