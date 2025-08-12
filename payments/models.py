@@ -1,5 +1,10 @@
 from django.db import models
 from django.utils import timezone
+from users.models import User
+from datetime import timedelta
+
+def generate_invoice_number():
+    return f"INV-{timezone.now().strftime('%Y%m%d%H%M%S')}"
 
 class Invoice(models.Model):
     STATUS_CHOICES = (
@@ -11,9 +16,9 @@ class Invoice(models.Model):
     )
 
     member = models.ForeignKey('users.User', on_delete=models.CASCADE)
-    number = models.CharField(max_length=50, unique=True)   
-    issue_date = models.DateField(default=timezone.now)
-    due_date = models.DateField()
+    number = models.CharField(max_length=50, unique=True, default=generate_invoice_number)   
+    issue_date = models.DateField(default=timezone.localdate)
+    due_date = models.DateField(default=timezone.localdate() + timedelta(days=7))
     total_cents = models.PositiveIntegerField()
     currency = models.CharField(max_length=3, default='USD')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='DRAFT')

@@ -5,11 +5,11 @@ class InvoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invoice
         fields = ['id', 'member', 'number', 'issue_date', 'due_date', 'total_cents', 'currency', 'status', 'notes', 'metadata']
-        read_only_fields = ['id', 'member', 'number', 'issue_date', 'due_date', 'total_cents', 'currency', 'notes', 'metadata']
+        read_only_fields = ['id', 'member', 'number', 'issue_date', 'due_date', 'total_cents', 'currency']
 
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = ['id', 'invoice', 'member', 'amount_cents', 'currency', 'status', 'reference', 'metadata', 'paid_at', 'created_at']
-        read_only_fields = ['id', 'invoice', 'member', 'amount_cents', 'currency', 'status', 'reference', 'metadata', 'paid_at', 'created_at']
+        read_only_fields = ['id', 'member', 'amount_cents', 'currency', 'status', 'reference', 'metadata', 'paid_at', 'created_at']
