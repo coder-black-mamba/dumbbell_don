@@ -1,7 +1,12 @@
 from core.utils.BASEModelViewSet import BaseModelViewSet
 from .models import FitnessClass, Booking, Attendance
-from .serializers import FitnessClassSerializer, BookingSerializer, AttendanceSerializer
+from .serializers import FitnessClassSerializer, BookingSerializer, AttendanceSerializer,ScheduleSerializer
 from .permissions import IsStaffOrAdminAndReadOnly
+from rest_framework.decorators import permission_classes,api_view
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from core.utils.api_response import success_response
+from classes.models import Booking  
 
 class FitnessClassViewSet(BaseModelViewSet):
     queryset = FitnessClass.objects.all()
@@ -26,3 +31,12 @@ class AttendanceViewSet(BaseModelViewSet):
     # def get_queryset(self):
     #     return Attendance.objects.filter(booking__member=self.request.user)
 
+
+
+# simple dunctional omponent for some member info
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
+def class_schedule(request):
+    data=Booking.objects.filter(member=request.user)
+    serializer=ScheduleSerializer(data, many=True)
+    return success_response(data=serializer.data)

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import FitnessClass, Booking, Attendance
+from users.models import User
 
 class FitnessClassSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,3 +21,20 @@ class AttendanceSerializer(serializers.ModelSerializer):
         model = Attendance
         fields = '__all__'
     
+class ScheduleInstructorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email']
+
+class ScheduleFitnessClassSerializer(serializers.ModelSerializer):
+    instructor = ScheduleInstructorSerializer(read_only=True)
+    class Meta:
+        model = FitnessClass
+        fields = ['id','title', 'description', 'instructor', 'start_datetime', 'end_datetime', 'duration_minutes', 'location']
+
+
+class ScheduleSerializer(serializers.ModelSerializer):
+    fitness_class = ScheduleFitnessClassSerializer(read_only=True)
+    class Meta:
+        model = Booking
+        fields = ['id', 'member', 'status','booked_at','fitness_class'] 
