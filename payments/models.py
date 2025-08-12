@@ -7,6 +7,7 @@ def generate_invoice_number():
     return f"INV-{timezone.now().strftime('%Y%m%d%H%M%S')}"
 
 class Invoice(models.Model):
+    # only paid and DRAFT Field are currently used in the application others will bw used when integreting frontend
     STATUS_CHOICES = (
         ('DRAFT', 'Draft'),
         ('SENT', 'Sent'),
@@ -30,6 +31,7 @@ class Invoice(models.Model):
 
 
 class Payment(models.Model):
+    # only paid  Field are currently used in the application others will bw used when integreting frontend
     STATUS_CHOICES = (
         ('PAID', 'Paid'),
         ('FAILED', 'Failed'),
