@@ -8,8 +8,7 @@ from classes.models import Attendance
 from classes.serializers import MemberAttendanceSerializer
 from feedback.models import Feedback
 from subscriptions.models import Subscription
-
-from reports.serializers import FeedbackReportSerializer
+from reports.serializers import FeedbackReportSerializer,SubscriptionReportSerializer
 
 @permission_classes([IsAdminUser])
 @api_view(['GET'])
@@ -96,19 +95,14 @@ def get_feedback_report(request):
     return success_response(data={"stats":stats,"report":serializer.data})
 
 
-@api_view(['GET'])
-@permission_classes([IsAdminUser])
-def get_memberships_report(request):
-    return HttpResponse("Memberships Report")
-
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def get_membership_report(request):
-    return HttpResponse("Membership Report")
+    subscriptions=Subscription.objects.all()
+    serializer= SubscriptionReportSerializer(subscriptions, many=True)
 
-
-@api_view(['GET'])
-@permission_classes([IsAdminUser])
-def get_subscription_report(request):
-    return HttpResponse("Subscription Report")
+    stats={"total_subscriptions":subscriptions.count(),"total_members":subscriptions.values('member').distinct().count(),"total_active":subscriptions.filter(status='ACTIVE').count(),"total_inactive":subscriptions.filter(status='INACTIVE').count(),"total_cancelled":subscriptions.filter(status='CANCELLED').count(),"total_expiring":subscriptions.filter(status='EXPIRING').count(),"total_expired":subscriptions.filter(status='EXPIRED').count(),"total_auto_renew":subscriptions.filter(auto_renew=True).count(),}
+    
+    
+    return success_response(data={"stats":stats,"report":serializer.data})
