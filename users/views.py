@@ -1,8 +1,7 @@
-from django.shortcuts import render
-from rest_framework.viewsets import ModelViewSet
+from core.utils.BASEModelViewSet import BaseModelViewSet
 from core.permissions import IsUserSelfOrAdmin
-from .models import ProfileImage
-from .serializers import ProfileImageSerializer
+from .models import ProfileImage, User
+from .serializers import ProfileImageSerializer, UserSerializer
 
 # class ProfileImageViewSet(ModelViewSet):
 #     serializer_class = ProfileImageSerializer
@@ -13,3 +12,8 @@ from .serializers import ProfileImageSerializer
 
 #     def perform_create(self, serializer):
 #         serializer.save(user_id=self.kwargs.get('user_pk'))
+
+class UserViewSet(BaseModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsUserSelfOrAdmin]

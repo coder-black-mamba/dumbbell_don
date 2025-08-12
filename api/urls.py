@@ -24,5 +24,5 @@ router.register("feedback-reports", FeedbackReportViewSet,basename="feedback-rep
 urlpatterns=router.urls
 urlpatterns += [
     path('auth/', include('djoser.urls')),
-    path('auth/', include('djoser.urls.jwt')),
+    path('auth/', include('djoser.urls.jwt')), 
 ]
