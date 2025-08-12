@@ -40,16 +40,27 @@ class ScheduleSerializer(serializers.ModelSerializer):
         model = Booking
         fields = ['id', 'member', 'status','booked_at','fitness_class'] 
 
+class MemberInstructorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+
+class MemberFitnessClassSerializer(serializers.ModelSerializer):
+    instructor = MemberInstructorSerializer(read_only=True)
+    class Meta:
+        model = FitnessClass
+        fields = ['title', 'description', 'instructor']
+
 
 class MemberBookingSerializer(serializers.ModelSerializer):
-    fitness_class = ScheduleFitnessClassSerializer(read_only=True)
+    class_data = MemberFitnessClassSerializer(source='fitness_class', read_only=True)
     class Meta:
         model = Booking
-        fields = ['id', 'member', 'status','booked_at','fitness_class'] 
+        fields = ['member','class_data'] 
 
 
 class MemberAttendanceSerializer(serializers.ModelSerializer):
-    booking = MemberBookingSerializer(read_only=True)
+    booking_data = MemberBookingSerializer(source='booking', read_only=True)
     class Meta:
         model = Attendance
-        fields = ['id', 'booking', 'present','marked_by','marked_at']
+        fields = ['present','booking_data','marked_by','marked_at']

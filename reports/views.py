@@ -3,12 +3,13 @@ from rest_framework.decorators import api_view,permission_classes
 from core.utils.api_response import success_response,error_response
 from rest_framework.permissions import IsAdminUser
 from payments.models import Invoice
-from django.db.models import Sum
+from django.db.models import Sum,Count,Avg
 from classes.models import Attendance
 from classes.serializers import MemberAttendanceSerializer
 from feedback.models import Feedback
-from users.models import User
 from subscriptions.models import Subscription
+
+from reports.serializers import FeedbackReportSerializer
 
 @permission_classes([IsAdminUser])
 @api_view(['GET'])
@@ -60,23 +61,54 @@ def get_payment_report(request):
     return success_response(data={"stats":{"total_paid":f"${total_paid/100}","total_outstanding":f"${total_outstanding/100}","total_invoices":total_invoices,"total_payments":total_payments},"report":report})
 
 
-
 @api_view(['GET'])
+@permission_classes([IsAdminUser])
 def get_attendance_report(request): 
-    return HttpResponse("Attendance Report")
+    class_id=request.query_params.get('class_id')
+    if not class_id:
+        return error_response(message="Class ID is required")
+    
+    attendance=Attendance.objects.select_related('booking__member').filter(booking__fitness_class_id=class_id)
+    participant_count=attendance.values('booking__member').distinct().count() 
+    
+    preset_students=attendance.filter(present=True).count()
+    absent_students=attendance.filter(present=False).count()
+    present_percentage=preset_students/attendance.count()
+    absent_percentage=absent_students/attendance.count()
+
+    serializer=MemberAttendanceSerializer(attendance, many=True)
+    stats={"total_attendance":attendance.count(),"total_members":participant_count,"absent":absent_students,"present":preset_students,"present_percentage":present_percentage*100,"absent_percentage":absent_percentage*100}
+    return success_response(data={"stats":stats,"report":serializer.data})
 
 
 @api_view(['GET'])
+@permission_classes([IsAdminUser])
 def get_feedback_report(request):
-    return HttpResponse("Feedback Report")
+    feedback=Feedback.objects.all()
 
+
+    stats={"total_feedback":feedback.count(),"total_members":feedback.values('member').distinct().count(),"total_positive":feedback.filter(rating__gte=4).count(),"total_negative":feedback.filter(rating__lte=2).count() ,"total_neutral":feedback.filter(rating__gte=2,rating__lte=4).count(),"average_rating":feedback.aggregate(avg=Avg('rating'))['avg'],"rating_distribution":feedback.values('rating').annotate(count=Count('rating')),}
+    
+    
+    
+    
+    serializer=FeedbackReportSerializer(feedback, many=True)
+    return success_response(data={"stats":stats,"report":serializer.data})
 
 
 @api_view(['GET'])
+@permission_classes([IsAdminUser])
+def get_memberships_report(request):
+    return HttpResponse("Memberships Report")
+
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
 def get_membership_report(request):
     return HttpResponse("Membership Report")
 
 
 @api_view(['GET'])
+@permission_classes([IsAdminUser])
 def get_subscription_report(request):
     return HttpResponse("Subscription Report")
