@@ -8,6 +8,7 @@ from django.db.models import Sum
 @permission_classes([IsAdminUser])
 @api_view(['GET'])
 def get_payment_report(request):
+    # for stats and report fields took help from ai 
     invoices = Invoice.objects.all().select_related('member').prefetch_related('payments')
     report = []
     for invoice in invoices:
