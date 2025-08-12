@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-==&+^d*3_s6)i0u&t(@sqbbu*1d_jt_cwu1$s*)q%-mwiepe5$"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  # Make sure DEBUG is True for development
+DEBUG = True  # Make sure DEBUG is True for development
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "dumbbell-don.vercel.app"]
 
@@ -169,6 +169,18 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'JWT Authorization header using the Bearer scheme. Example: "Bearer {token}"',
+        }
+    },
+}
 
 
 
