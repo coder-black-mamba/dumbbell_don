@@ -1,9 +1,14 @@
+from django.http import HttpResponse
 from rest_framework.decorators import api_view,permission_classes
-from core.utils.api_response import success_response
+from core.utils.api_response import success_response,error_response
 from rest_framework.permissions import IsAdminUser
 from payments.models import Invoice
 from django.db.models import Sum
-
+from classes.models import Attendance
+from classes.serializers import MemberAttendanceSerializer
+from feedback.models import Feedback
+from users.models import User
+from subscriptions.models import Subscription
 
 @permission_classes([IsAdminUser])
 @api_view(['GET'])
@@ -44,26 +49,34 @@ def get_payment_report(request):
                 for p in invoice.payments.all()
             ]
         })
-    return success_response(data=report)
+
+
+    # lets aggregate it first 
+    total_paid = sum(invoice.payments.filter(status='PAID').aggregate(total=Sum('amount_cents'))['total'] or 0 for invoice in invoices)
+
+    total_outstanding = sum(invoice.total_cents for invoice in invoices) - total_paid
+    total_invoices = invoices.count()
+    total_payments = sum(invoice.payments.count() for invoice in invoices)
+    return success_response(data={"stats":{"total_paid":f"${total_paid/100}","total_outstanding":f"${total_outstanding/100}","total_invoices":total_invoices,"total_payments":total_payments},"report":report})
 
 
 
 @api_view(['GET'])
-def get_attendance_report(request):
-    return success_response(data={"hello":"Hello World"})
+def get_attendance_report(request): 
+    return HttpResponse("Attendance Report")
 
 
 @api_view(['GET'])
 def get_feedback_report(request):
-    return success_response(data={"hello":"Hello World"})
+    return HttpResponse("Feedback Report")
 
 
 
 @api_view(['GET'])
 def get_membership_report(request):
-    return success_response(data={"hello":"Hello World"})
+    return HttpResponse("Membership Report")
 
 
 @api_view(['GET'])
 def get_subscription_report(request):
-    return success_response(data={"hello":"Hello World"})
+    return HttpResponse("Subscription Report")
