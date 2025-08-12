@@ -1,7 +1,7 @@
 from core.utils.BASEModelViewSet import BaseModelViewSet
-from core.permissions import IsUserSelfOrAdmin
-from .models import ProfileImage, User
-from .serializers import ProfileImageSerializer, UserSerializer
+from .models import User
+from .serializers import  UserSerializer
+from .permissions import IsAdminOrStaffReadOnly
 
 # class ProfileImageViewSet(ModelViewSet):
 #     serializer_class = ProfileImageSerializer
@@ -16,4 +16,4 @@ from .serializers import ProfileImageSerializer, UserSerializer
 class UserViewSet(BaseModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsUserSelfOrAdmin]
+    permission_classes = [IsAdminOrStaffReadOnly]

@@ -4,6 +4,7 @@ from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer,
 class UserCreateSerializer(BaseUserCreateSerializer):
     class Meta(BaseUserCreateSerializer.Meta):
         fields = ['email', 'password', 'first_name', 'last_name', 'phone_number', 'address','profile_picture']
+        read_only_fields = ['role','join_date','last_active','updated_at','created_at','profile_picture_url','id']
 
 
 class UserSerializer(BaseUserSerializer):

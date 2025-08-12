@@ -21,5 +21,7 @@ class IsStaffOrAdminAndReadOnly(BasePermission):
             return True
         return request.user and (request.user.role == User.ADMIN or request.user.role == User.STAFF)
     
-    def has_object_permission(self, request, view, obj):
+
+class IsAdminOrStaff(BasePermission):
+    def has_permission(self, request, view):
         return request.user and (request.user.role == User.ADMIN or request.user.role == User.STAFF)
