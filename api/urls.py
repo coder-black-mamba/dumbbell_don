@@ -33,3 +33,5 @@ urlpatterns += [
     path('classes/', include('classes.urls')),
     path('reports/', include('reports.urls')),
 ]
+
+

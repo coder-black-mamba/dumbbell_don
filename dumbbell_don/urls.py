@@ -16,11 +16,15 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,re_path
 from django.urls import include
 from debug_toolbar.toolbar import debug_toolbar_urls
 from django.http import HttpResponse,JsonResponse
 from django.conf.urls import handler400,handler403,handler404,handler500
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from rest_framework import permissions
+import re
 
 def hello_world(request):
     return HttpResponse("Hello, world!")
@@ -31,6 +35,37 @@ urlpatterns = [
     path("core/", include("core.urls")),
     path("api/v1/", include("api.urls")),
 ]  + debug_toolbar_urls()
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Dumbbell Don Gym Management API",
+      default_version='v1',
+      description="Dumbbell Don Gym Management API",
+      terms_of_service="https://www.example.com/terms/",
+      contact=openapi.Contact(email="sde.sayed24@gmail.com"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
+
+urlpatterns += [
+    # Your existing urls
+
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+]
+
+
+
+
+
+
+
+
+
+
 
 # customizing default error handlers to return json response instead of html 
 def custom_handler400(request, exception):
