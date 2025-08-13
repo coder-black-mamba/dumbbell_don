@@ -1,9 +1,11 @@
+from drf_yasg.utils import swagger_auto_schema
 from .models import Feedback
 from .serializers import FeedbackSerializer
 from core.utils.BASEModelViewSet import BaseModelViewSet
 from .permissions import IsAdminOrSelfOrReadOnly
 from users.models import User
 
+@swagger_auto_schema(tags=['Feedback'])
 class FeedbackViewSet(BaseModelViewSet):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer

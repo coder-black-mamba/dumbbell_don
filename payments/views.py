@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from core.utils.BASEModelViewSet import BaseModelViewSet
 from .models import Invoice, Payment
 from .serializers import InvoiceSerializer, PaymentSerializer
@@ -9,6 +10,7 @@ from core.utils.api_response import error_response
 from core.permissions import IsAdminOrSelf
 import uuid
 
+@swagger_auto_schema(tags=['Invoices'])
 class InvoiceViewSet(BaseModelViewSet):
     # queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
@@ -33,6 +35,7 @@ class InvoiceViewSet(BaseModelViewSet):
 
 
 
+@swagger_auto_schema(tags=['Payments'])
 class PaymentViewSet(BaseModelViewSet):
     #    queryset = Payment.objects.all()
     serializer_class = PaymentSerializer

@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from django.http import HttpResponse
 from rest_framework.decorators import api_view,permission_classes
 from core.utils.api_response import success_response,error_response
@@ -10,6 +11,7 @@ from feedback.models import Feedback
 from subscriptions.models import Subscription
 from reports.serializers import FeedbackReportSerializer,SubscriptionReportSerializer
 
+@swagger_auto_schema(method='get', tags=['Reports'])
 @permission_classes([IsAdminUser])
 @api_view(['GET'])
 def get_payment_report(request):
@@ -60,6 +62,7 @@ def get_payment_report(request):
     return success_response(data={"stats":{"total_paid":f"${total_paid/100}","total_outstanding":f"${total_outstanding/100}","total_invoices":total_invoices,"total_payments":total_payments},"report":report})
 
 
+@swagger_auto_schema(method='get', tags=['Reports'])
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def get_attendance_report(request): 
@@ -80,6 +83,7 @@ def get_attendance_report(request):
     return success_response(data={"stats":stats,"report":serializer.data})
 
 
+@swagger_auto_schema(method='get', tags=['Reports'])
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def get_feedback_report(request):
@@ -96,6 +100,7 @@ def get_feedback_report(request):
 
 
 
+@swagger_auto_schema(method='get', tags=['Reports'])
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def get_membership_report(request):

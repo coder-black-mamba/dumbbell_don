@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from core.utils.api_response import success_response
 from core.utils.BASEModelViewSet import BaseModelViewSet
 from .models import FitnessClass, Booking, Attendance
@@ -14,7 +15,7 @@ class FitnessClassViewSet(BaseModelViewSet):
     serializer_class = FitnessClassSerializer
     permission_classes = [IsStaffOrAdminAndReadOnly]
  
-
+@swagger_auto_schema(tags=['Bookings'])
 class BookingViewSet(BaseModelViewSet):
     serializer_class = BookingSerializer
     
@@ -26,7 +27,7 @@ class BookingViewSet(BaseModelViewSet):
     def perform_create(self, serializer):
         serializer.save(member=self.request.user)
 
-
+@swagger_auto_schema(tags=['Attendance'])
 class AttendanceViewSet(BaseModelViewSet):
     serializer_class = AttendanceSerializer
     permission_classes = [IsStuffOrSelfOrReadOnly]
@@ -42,6 +43,7 @@ class AttendanceViewSet(BaseModelViewSet):
 
 
 # simple dunctional omponent for some member info
+@swagger_auto_schema(method='get', tags=['Member Info'])
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def class_schedule(request):
@@ -50,6 +52,7 @@ def class_schedule(request):
     return success_response(data=serializer.data)
 
 
+@swagger_auto_schema(method='get', tags=['Member Info'])
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def bookings(request):
@@ -59,6 +62,7 @@ def bookings(request):
 
 
 
+@swagger_auto_schema(method='get', tags=['Member Info'])
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def show_attendance(request):

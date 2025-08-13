@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from core.utils.BASEModelViewSet import BaseModelViewSet
 from .models import User
 from .serializers import  UserSerializer
@@ -13,6 +14,7 @@ from .permissions import IsAdminOrStaffReadOnly
 #     def perform_create(self, serializer):
 #         serializer.save(user_id=self.kwargs.get('user_pk'))
 
+@swagger_auto_schema(tags=['Users'])
 class UserViewSet(BaseModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
