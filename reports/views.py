@@ -10,6 +10,7 @@ from feedback.models import Feedback
 from subscriptions.models import Subscription
 from reports.serializers import FeedbackReportSerializer,SubscriptionReportSerializer
 
+# membership documentation done [wrong commit on commit 9d662846a1897253b2b1b134cd715dbbbd217dee]
 @permission_classes([IsAdminUser])
 @api_view(['GET'])
 def get_payment_report(request):
