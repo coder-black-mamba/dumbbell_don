@@ -187,6 +187,15 @@ class AttendanceViewSet(BaseModelViewSet):
 
 # simple dunctional omponent for some member info
 @permission_classes([IsAuthenticated])
+@swagger_auto_schema(
+    method="get",
+    operation_summary="Show Class Schedule",
+    operation_description="Show Class Schedule. Admin/Staff sees all, Member sees their own.",
+    responses={
+        200: ScheduleSerializer(many=True),  
+        401: SwaggerErrorResponseSerializer,
+    }
+)
 @api_view(['GET'])
 def class_schedule(request):
     data=Booking.objects.filter(member=request.user)
@@ -195,6 +204,15 @@ def class_schedule(request):
 
 
 @permission_classes([IsAuthenticated])
+@swagger_auto_schema(
+    method="get",
+    operation_summary="Show Bookings",
+    operation_description="Show Bookings. Admin/Staff sees all, Member sees their own.",
+    responses={
+        200: MemberBookingSerializer(many=True),  
+        401: SwaggerErrorResponseSerializer,
+    }
+)
 @api_view(['GET'])
 def bookings(request):
     data=Booking.objects.filter(member=request.user)
@@ -206,15 +224,14 @@ def bookings(request):
 @permission_classes([IsAuthenticated])
 @swagger_auto_schema(
     method="get",
-    operation_summary="Show attendance",
-    operation_description="Show attendance. Admin/Staff sees all, Member sees their own.",
+    operation_summary="Show Attendance",
+    operation_description="Show Attendance. Admin/Staff sees all, Member sees their own.",
     responses={
-        200: SwaggerSuccessListResponseSerializer,  
+        200: MemberAttendanceSerializer(many=True),  
         401: SwaggerErrorResponseSerializer,
     }
 )
 @api_view(['GET'])
-
 def show_attendance(request):
     if request.user.role == User.ADMIN:  
         data=Attendance.objects.all()
