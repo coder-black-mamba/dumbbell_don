@@ -77,3 +77,7 @@ To run the automated tests for the project, use the following command:
 ```bash
 python manage.py test
 ```
+
+## Deployment
+
+### Alhamdulillah Done On Time For Phitron
