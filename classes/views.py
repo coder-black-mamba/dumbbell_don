@@ -14,6 +14,72 @@ class FitnessClassViewSet(BaseModelViewSet):
     queryset = FitnessClass.objects.all()
     serializer_class = FitnessClassSerializer
     permission_classes = [IsStaffOrAdminAndReadOnly]
+
+    @swagger_auto_schema(
+        operation_summary="Create fitness class record",
+        operation_description="Create fitness class record (Admin/Staff/Member sees all) Staff Can Add Fitness Class . Member Can View Fitness Class",
+        responses={
+            200:FitnessClassSerializer,
+            401:SwaggerErrorResponseSerializer,
+        }
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="List fitness class records",
+        operation_description="List fitness class records (Admin/Staff/Member sees all) Staff Can Add Fitness Class . Member Can View Fitness Class",
+        responses={
+            200:FitnessClassSerializer(many=True),
+            401:SwaggerErrorResponseSerializer,
+        }
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Retrieve fitness class record",
+        operation_description="Retrieve fitness class record . Admin/Staff/Member Can Retrieve Any Fitness Class",
+        responses={
+            200:FitnessClassSerializer,
+            401:SwaggerErrorResponseSerializer,
+        }
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Update fitness class record",
+        operation_description="Update fitness class record . Only Admin And Staff Can Update Any Fitness Class",
+        responses={
+            200:FitnessClassSerializer,
+            401:SwaggerErrorResponseSerializer,
+        }
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Partial update fitness class record",
+        operation_description="Partial update fitness class record . Only Admin And Staff Can Update Any Fitness Class",
+        responses={
+            200:FitnessClassSerializer,
+            401:SwaggerErrorResponseSerializer,
+        }
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Destroy fitness class record",
+        operation_description="Destroy fitness class record . Only Admin And Staff Can Delete Any Fitness Class",
+        responses={
+            200:FitnessClassSerializer,
+            401:SwaggerErrorResponseSerializer,
+        }
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)    
  
 
 class BookingViewSet(BaseModelViewSet):
