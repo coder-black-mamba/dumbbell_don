@@ -7,7 +7,7 @@ from rest_framework.decorators import permission_classes,api_view
 from rest_framework.permissions import IsAuthenticated
 from classes.models import Booking,Attendance  
 from users.models import User
-from core.serializers import SwaggerErrorResponseSerializer
+from core.serializers import SwaggerErrorResponseSerializer,SwaggerSuccessListResponseSerializer
 from drf_yasg.utils import swagger_auto_schema
 
 class FitnessClassViewSet(BaseModelViewSet):
@@ -204,7 +204,17 @@ def bookings(request):
 
 
 @permission_classes([IsAuthenticated])
+@swagger_auto_schema(
+    method="get",
+    operation_summary="Show attendance",
+    operation_description="Show attendance. Admin/Staff sees all, Member sees their own.",
+    responses={
+        200: SwaggerSuccessListResponseSerializer,  
+        401: SwaggerErrorResponseSerializer,
+    }
+)
 @api_view(['GET'])
+
 def show_attendance(request):
     if request.user.role == User.ADMIN:  
         data=Attendance.objects.all()

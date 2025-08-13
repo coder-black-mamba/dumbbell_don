@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from classes.serializers import MemberAttendanceSerializer
 # swagger serializers
 class SwaggerSuccessResponseSerializer(serializers.Serializer):
     """
@@ -21,3 +21,18 @@ class SwaggerErrorResponseSerializer(serializers.Serializer):
     message = serializers.CharField(default="Internal Server Error")
     errors = serializers.DictField(default={})
 
+
+
+class SwaggerSuccessListResponseSerializer(serializers.Serializer):
+    success = serializers.BooleanField(default=True)
+    status = serializers.IntegerField(default=200)
+    message = serializers.CharField(default="Request successful")
+    data = MemberAttendanceSerializer(many=True)
+    meta = serializers.DictField(default={})
+
+
+class SwaggerErrorResponseSerializer(serializers.Serializer):
+    success = serializers.BooleanField(default=False)
+    status = serializers.IntegerField(default=401)
+    message = serializers.CharField(default="Unauthorized")
+    errors = serializers.DictField(default={})
