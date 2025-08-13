@@ -9,10 +9,21 @@ from classes.serializers import MemberAttendanceSerializer
 from feedback.models import Feedback
 from subscriptions.models import Subscription
 from reports.serializers import FeedbackReportSerializer,SubscriptionReportSerializer
-
+from core.serializers import SwaggerErrorResponseSerializer
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 # membership documentation done [wrong commit on commit 9d662846a1897253b2b1b134cd715dbbbd217dee]
-@permission_classes([IsAdminUser])
+@swagger_auto_schema(
+    method='GET',
+    operation_summary="Get Payment Report",
+    operation_description="Get Payment Report. Admin can get payment report.",
+    responses={
+        200: openapi.Response(description="Payment Report"),
+        401: SwaggerErrorResponseSerializer,
+    }
+)
 @api_view(['GET'])
+@permission_classes([IsAdminUser])
 def get_payment_report(request):
     # for stats and report fields took help from ai 
     invoices = Invoice.objects.all().select_related('member').prefetch_related('payments')
@@ -61,6 +72,16 @@ def get_payment_report(request):
     return success_response(data={"stats":{"total_paid":f"${total_paid/100}","total_outstanding":f"${total_outstanding/100}","total_invoices":total_invoices,"total_payments":total_payments},"report":report})
 
 
+@swagger_auto_schema(
+    method='GET',
+    operation_summary="Get Attendance Report",
+    operation_description="Get Attendance Report. Admin can get attendance report.",
+    responses={
+        200: openapi.Response(description="Attendance Report"),
+        401: SwaggerErrorResponseSerializer,
+    },
+    manual_parameters=[openapi.Parameter(name='class_id', in_='query', type=openapi.TYPE_STRING, required=True, description='Class ID')]
+)
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def get_attendance_report(request): 
@@ -81,6 +102,15 @@ def get_attendance_report(request):
     return success_response(data={"stats":stats,"report":serializer.data})
 
 
+@swagger_auto_schema(
+    method='GET',
+    operation_summary="Get Feedback Report",
+    operation_description="Get Feedback Report. Admin can get feedback report.",
+    responses={
+        200: openapi.Response(description="Feedback Report"),
+        401: SwaggerErrorResponseSerializer,
+    }
+)
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def get_feedback_report(request):
@@ -97,6 +127,15 @@ def get_feedback_report(request):
 
 
 
+@swagger_auto_schema(
+    method='GET',
+    operation_summary="Get Membership Report",
+    operation_description="Get Membership Report. Admin can get membership report.",
+    responses={
+        200: openapi.Response(description="Membership Report"),
+        401: SwaggerErrorResponseSerializer,
+    }
+)
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def get_membership_report(request):
