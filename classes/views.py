@@ -20,6 +20,7 @@ class BookingViewSet(BaseModelViewSet):
     serializer_class = BookingSerializer
     permission_classes = [BookingPermission]
     
+    # business logic
     def get_queryset(self):
         if self.request.user.role == User.ADMIN:
             return Booking.objects.all()
@@ -27,6 +28,73 @@ class BookingViewSet(BaseModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(member=self.request.user)
+
+    # for swagger documentation
+    @swagger_auto_schema(
+        operation_summary="Create booking record ",
+        operation_description="Create booking record (Admin/Staff sees all) Member Can Add Booking",
+        responses={
+            200:MemberBookingSerializer,
+            401:SwaggerErrorResponseSerializer,
+        }
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="List booking records ",
+        operation_description="List booking records (Admin/Staff sees all) Member Can See His All Booking",
+        responses={
+            200:MemberBookingSerializer(many=True),
+            401:SwaggerErrorResponseSerializer,
+        }
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Retrieve booking record (Admin/Staff sees all)",
+        operation_description="Retrieve booking record (Admin/Staff sees all) Member Can See His Booking",
+        responses={
+            200:MemberBookingSerializer,
+            401:SwaggerErrorResponseSerializer,
+        }
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Update booking record",
+        operation_description="Update booking record (Admin/Staff sees all) Only Admin Can Update Any Booking",
+        responses={
+            200:MemberBookingSerializer,
+            401:SwaggerErrorResponseSerializer,
+        }
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Partial update booking record ",
+        operation_description="Partial update booking record (Admin/Staff sees all) Only Admin Can Update Any Booking",
+        responses={
+            200:MemberBookingSerializer,
+            401:SwaggerErrorResponseSerializer,
+        }
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Destroy booking record",
+        operation_description="Destroy booking record (Admin/Staff sees all) Only Admin Can Delete Any Booking",
+        responses={
+            200:MemberBookingSerializer,
+            401:SwaggerErrorResponseSerializer,
+        }
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
 
 class AttendanceViewSet(BaseModelViewSet):
@@ -49,7 +117,7 @@ class AttendanceViewSet(BaseModelViewSet):
 
     # for swagger documentation
     @swagger_auto_schema(
-        operation_summary="Create attendance record (Admin/Staff sees all)",
+        operation_summary="Create attendance record",
         operation_description="Create attendance record (Admin/Staff sees all) Staff Can Add Attendence",
         responses={
             200:MemberAttendanceSerializer,
@@ -61,7 +129,7 @@ class AttendanceViewSet(BaseModelViewSet):
 
 
     @swagger_auto_schema(
-        operation_summary="List attendance records (Admin/Staff sees all)",
+        operation_summary="List attendance records",
         operation_description="List attendance records (Admin/Staff sees all) Staff Can See All Attendance",
         responses={
             200:MemberAttendanceSerializer(many=True),
@@ -72,7 +140,7 @@ class AttendanceViewSet(BaseModelViewSet):
         return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        operation_summary="Retrieve attendance record (Admin/Staff sees all)",
+        operation_summary="Retrieve attendance record",
         operation_description="Retrieve attendance record (Admin/Staff sees all) Staff Can See All Attendance",
         responses={
             200:MemberAttendanceSerializer,
@@ -83,8 +151,8 @@ class AttendanceViewSet(BaseModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        operation_summary="Update attendance record (Admin/Staff sees all)",
-        operation_description="Update attendance record (Admin/Staff sees all) Staff Can Update Attendence",
+        operation_summary="Update attendance record",
+        operation_description="Update attendance record (Admin/Staff sees all) ADmin/Staff Can Update Attendence",
         responses={
             200:MemberAttendanceSerializer,
             401:SwaggerErrorResponseSerializer,
@@ -94,8 +162,8 @@ class AttendanceViewSet(BaseModelViewSet):
         return super().update(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        operation_summary="Partial update attendance record (Admin/Staff sees all)",
-        operation_description="Partial update attendance record (Admin/Staff sees all) Staff Can Update Attendence",
+        operation_summary="Partial update attendance record",
+        operation_description="Partial update attendance record (Admin/Staff sees all) ADmin/Staff Can Update Attendence",
         responses={
             200:MemberAttendanceSerializer,
             401:SwaggerErrorResponseSerializer,
@@ -105,8 +173,8 @@ class AttendanceViewSet(BaseModelViewSet):
         return super().partial_update(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        operation_summary="Destroy attendance record (Admin/Staff sees all)",
-        operation_description="Destroy attendance record (Admin/Staff sees all) Staff Can Delete Attendence",
+        operation_summary="Destroy attendance record",
+        operation_description="Destroy attendance record (Admin/Staff sees all) ADmin/Staff Can Delete Attendence",
         responses={
             200:MemberAttendanceSerializer,
             401:SwaggerErrorResponseSerializer,
