@@ -5,7 +5,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invoice
         fields = ['id', 'member', 'number', 'issue_date', 'due_date', 'total_cents', 'currency', 'status', 'notes', 'metadata']
-        read_only_fields = ['id', 'member', 'number', 'issue_date', 'due_date', 'total_cents', 'currency']
+        read_only_fields = ['id', 'member', 'number', 'issue_date', 'due_date', 'total_cents', 'currency','status']
 
 
 class PaymentSerializer(serializers.ModelSerializer):

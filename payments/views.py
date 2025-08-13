@@ -3,14 +3,18 @@ from .models import Invoice, Payment
 from .serializers import InvoiceSerializer, PaymentSerializer
 from users.models import User
 from subscriptions.models import Subscription
-from rest_framework.response import Response
+from classes.models import Booking
 from rest_framework import status
 from core.utils.api_response import error_response
 from core.permissions import IsAdminOrSelf
 import uuid
 from django.utils import timezone
-
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from rest_framework.response import Response
+ 
 class InvoiceViewSet(BaseModelViewSet):
+    
     # queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
     permission_classes = [IsAdminOrSelf]
@@ -20,15 +24,45 @@ class InvoiceViewSet(BaseModelViewSet):
             return Invoice.objects.all()
         return Invoice.objects.filter(member=self.request.user)
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'payment_type',
+                openapi.IN_QUERY,
+                description="Type of payment",
+                type=openapi.TYPE_STRING,
+                required=False,
+                enum=["subscription", "booking", "other"]
+            ),
+            openapi.Parameter(
+                'id',
+                openapi.IN_QUERY,
+                description="Subscription ID or Booking ID for payment",
+                type=openapi.TYPE_STRING,
+                required=False
+            )
+        ]
+    )
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
     def perform_create(self, serializer):
 
         payment_type=self.request.query_params.get('payment_type')
+        id=self.request.query_params.get('id')
         
         if payment_type == 'subscription':
-            subscription_data = Subscription.objects.get(member=self.request.user)
-            serializer.save(member=self.request.user, total_cents=subscription_data.plan.price_cents, metadata={"subscription": str(subscription_data.plan)})
+            subscription_data = Subscription.objects.get(member=self.request.user, id=id)
+            serializer.save(member=self.request.user, total_cents=subscription_data.plan.price_cents, metadata={"subscription": str(subscription_data.plan),"payment_type": "subscription"})
+        elif payment_type == 'booking':
+            booking_data = Booking.objects.get(id=id)
+            serializer.save(member=self.request.user, total_cents=booking_data.fitness_class.price_cents, metadata={"booking": str(booking_data),"payment_type": "booking"})
         else:
-            serializer.save(member=self.request.user, total_cents=0, metadata={"subscription": "Empty Invoice"})
+            serializer.save(member=self.request.user, total_cents=0, metadata={"other": "Empty Invoice"})
 
 
 
@@ -41,6 +75,12 @@ class PaymentViewSet(BaseModelViewSet):
     
     def perform_create(self, serializer):
         invoice = Invoice.objects.get(id=self.request.data.get('invoice'))
+        payment_type=invoice.metadata.get('payment_type')
+        
+
+        
+
+
         if invoice.status == 'PAID':
             return error_response('Invoice already paid', status_code=status.HTTP_400_BAD_REQUEST)
         if invoice.total_cents > self.request.data.get('amount_cents'):
@@ -56,7 +96,7 @@ class PaymentViewSet(BaseModelViewSet):
             invoice.save()
             serializer.save(member=self.request.user,amount_cents=invoice.total_cents,status='PAID',reference=str(uuid.uuid4()),paid_at=timezone.now(),metadata={"invoice": str(invoice.number)})
         else:
-            serializer.save(member=self.request.user,amount_cents=invoice.total_cents,status='FAILED',reference=str(uuid.uuid4()),paid_at=timezone.now(),metadata={"invoice": str(invoice.number),"subscription": str(invoice.metadata.get('subscription'))})
+            serializer.save(member=self.request.user,amount_cents=invoice.total_cents,status='FAILED',reference=str(uuid.uuid4()),paid_at=timezone.now(),metadata={"invoice": str(invoice.number),"subscription": str(invoice.metadata.get('subscription')),"booking": str(invoice.metadata.get('booking'))})
     
     def get_queryset(self):
         if self.request.user.role == User.ADMIN or self.request.user.role == User.STAFF:

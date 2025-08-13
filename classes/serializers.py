@@ -13,7 +13,7 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = ['id', 'member', 'fitness_class', 'status','booked_at']
-        read_only_fields = ['id', 'created_at', 'updated_at','member','booked_at']
+        read_only_fields = ['id', 'created_at', 'updated_at','member','booked_at','status']
 
 
 class AttendanceSerializer(serializers.ModelSerializer):

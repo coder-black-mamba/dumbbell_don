@@ -5,6 +5,7 @@ class FitnessClass(models.Model):
     description = models.TextField()
     instructor = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
     capacity = models.PositiveIntegerField()
+    price_cents = models.PositiveIntegerField()
     duration_minutes = models.PositiveIntegerField()
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()

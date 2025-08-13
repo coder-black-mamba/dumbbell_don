@@ -5,4 +5,4 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = ['id','member','plan', 'start_date', 'end_date', 'status', 'auto_renew']
-        read_only_fields = ['id', 'start_date', 'end_date', 'auto_renew', 'member']
+        read_only_fields = ['id', 'start_date','status', 'end_date', 'auto_renew', 'member']
