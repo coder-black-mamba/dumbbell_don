@@ -1,3 +1,4 @@
+from django.forms import ValidationError
 from core.utils.BASEModelViewSet import BaseModelViewSet
 from .models import Invoice, Payment
 from .serializers import InvoiceSerializer, PaymentSerializer
@@ -57,10 +58,13 @@ class InvoiceViewSet(BaseModelViewSet):
         
         if payment_type == 'subscription':
             subscription_data = Subscription.objects.get(member=self.request.user, id=id)
-            serializer.save(member=self.request.user, total_cents=subscription_data.plan.price_cents, metadata={"subscription": str(subscription_data.plan),"payment_type": "subscription"})
+            metadata={"subscription": str(subscription_data.plan),"payment_type": "subscription","subscription_id": subscription_data.id}
+
+            serializer.save(member=self.request.user, total_cents=subscription_data.plan.price_cents, metadata=metadata)
         elif payment_type == 'booking':
             booking_data = Booking.objects.get(id=id)
-            serializer.save(member=self.request.user, total_cents=booking_data.fitness_class.price_cents, metadata={"booking": str(booking_data),"payment_type": "booking"})
+            metadata={"booking": str(booking_data),"payment_type": "booking","booking_id": booking_data.id}
+            serializer.save(member=self.request.user, total_cents=booking_data.fitness_class.price_cents, metadata=metadata)
         else:
             serializer.save(member=self.request.user, total_cents=0, metadata={"other": "Empty Invoice"})
 
@@ -77,26 +81,39 @@ class PaymentViewSet(BaseModelViewSet):
         invoice = Invoice.objects.get(id=self.request.data.get('invoice'))
         payment_type=invoice.metadata.get('payment_type')
         
+        
 
         
 
 
         if invoice.status == 'PAID':
-            return error_response('Invoice already paid', status_code=status.HTTP_400_BAD_REQUEST)
-        if invoice.total_cents > self.request.data.get('amount_cents'):
-            return error_response('Amount is less than invoice total', status_code=status.HTTP_400_BAD_REQUEST)
-        if invoice.total_cents < self.request.data.get('amount_cents'):
-            return error_response('Amount is more than invoice total', status_code=status.HTTP_400_BAD_REQUEST)
+            raise ValidationError('Invoice already paid' )
+            return 
 
         if invoice.total_cents <=0:
-            return error_response('Invoice total is less than or equal to 0', status_code=status.HTTP_400_BAD_REQUEST)
+            raise ValidationError('Invoice total is less than or equal to 0')
+            return 
+        
 
-        if invoice.total_cents == self.request.data.get('amount_cents'):
+        # updating subscription and booking status
+        if payment_type == 'subscription':
+            subscription_data = Subscription.objects.get(member=self.request.user, id=invoice.metadata.get('subscription_id'))
+            subscription_data.status = 'ACTIVE'
+            subscription_data.save()
+
             invoice.status = 'PAID'
             invoice.save()
-            serializer.save(member=self.request.user,amount_cents=invoice.total_cents,status='PAID',reference=str(uuid.uuid4()),paid_at=timezone.now(),metadata={"invoice": str(invoice.number)})
-        else:
-            serializer.save(member=self.request.user,amount_cents=invoice.total_cents,status='FAILED',reference=str(uuid.uuid4()),paid_at=timezone.now(),metadata={"invoice": str(invoice.number),"subscription": str(invoice.metadata.get('subscription')),"booking": str(invoice.metadata.get('booking'))})
+            serializer.save(member=self.request.user,amount_cents=invoice.total_cents,status='PAID',reference=str(uuid.uuid4()),paid_at=timezone.now(),metadata={"invoice": str(invoice.number),"payment_type": payment_type,"subscription":str(subscription_data.plan),"subscription_id": subscription_data.id}) 
+
+        elif payment_type == 'booking':
+            booking_data = Booking.objects.get(id=invoice.metadata.get('booking_id'))
+            booking_data.status = 'ATTENDED'
+            booking_data.save()
+
+            invoice.status = 'PAID'
+            invoice.save()
+            serializer.save(member=self.request.user,amount_cents=invoice.total_cents,status='PAID',reference=str(uuid.uuid4()),paid_at=timezone.now(),metadata={"invoice": str(invoice.number),"payment_type": payment_type,"booking":str(booking_data),"booking_id": booking_data.id}) 
+        
     
     def get_queryset(self):
         if self.request.user.role == User.ADMIN or self.request.user.role == User.STAFF:
