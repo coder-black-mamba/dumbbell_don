@@ -35,7 +35,7 @@ urlpatterns = [
     path("hello/", hello_world),
     path("core/", include("core.urls")),
     path("api/v1/", include("api.urls")),
-]
+] + debug_toolbar_urls()
 
 schema_view = get_schema_view(
    openapi.Info(
