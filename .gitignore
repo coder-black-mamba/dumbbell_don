@@ -13,3 +13,9 @@ secrets.json
 secrets.txt
 # Virtual environments
 .venv
+
+# debug toolbar
+debug-toolbar
+.DS_Store
+
+

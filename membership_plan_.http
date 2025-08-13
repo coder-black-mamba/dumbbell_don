@@ -1,0 +1,16 @@
+GET http://localhost:8000/api/v1/membership-plans/
+Content-Type: application/json
+
+
+###
+POST http://localhost:8000/api/v1/membership-plans/
+Content-Type: application/json
+
+{
+    "name": "30 day sexy body building",
+    "description": "30 day sexy body building", 
+    "duration_days": 30,
+    "price_cents": 5999,
+    "is_active": true,
+    "created_by": 1
+}
