@@ -110,7 +110,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "dumbbell_don.wsgi.application"
+WSGI_APPLICATION = "dumbbell_don.wsgi.app"
 
 
 # Database
