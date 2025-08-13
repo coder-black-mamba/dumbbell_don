@@ -2,10 +2,9 @@ from core.utils.api_response import success_response
 from core.utils.BASEModelViewSet import BaseModelViewSet
 from .models import FitnessClass, Booking, Attendance
 from .serializers import FitnessClassSerializer, BookingSerializer, AttendanceSerializer,ScheduleSerializer,MemberAttendanceSerializer,MemberBookingSerializer
-from .permissions import IsStaffOrAdminAndReadOnly , IsStuffOrSelfOrReadOnly
+from .permissions import BookingPermission, IsStaffOrAdminAndReadOnly , IsStuffOrSelfOrReadOnly
 from rest_framework.decorators import permission_classes,api_view
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
 from classes.models import Booking,Attendance  
 from users.models import User
 
@@ -17,6 +16,7 @@ class FitnessClassViewSet(BaseModelViewSet):
 
 class BookingViewSet(BaseModelViewSet):
     serializer_class = BookingSerializer
+    permission_classes = [BookingPermission]
     
     def get_queryset(self):
         if self.request.user.role == User.ADMIN:
