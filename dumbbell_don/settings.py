@@ -15,6 +15,7 @@ from decouple import config
 from datetime import timedelta
 import os
 import cloudinary
+from django.conf import STATICFILES_STORAGE_ALIAS
 # Temporarily disabled Cloudinary storage
 # from cloudinary_storage.storage import MediaCloudinaryStorage
 
@@ -31,7 +32,7 @@ SECRET_KEY = "django-insecure-==&+^d*3_s6)i0u&t(@sqbbu*1d_jt_cwu1$s*)q%-mwiepe5$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True  # Make sure DEBUG is True for development
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "dumbbell-don.vercel.app"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", ".vercel.app"]
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -54,6 +55,7 @@ AUTH_USER_MODEL = "users.User"
 # Application definition
 
 INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic",
     "django.contrib.admin",
     "django.contrib.auth",  
     "django.contrib.contenttypes",
@@ -81,6 +83,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -167,7 +170,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+# STATIC_ROOT = BASE_DIR / "static"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
