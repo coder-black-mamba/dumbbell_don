@@ -9,7 +9,7 @@ from drf_yasg.utils import swagger_auto_schema
 class MembershipPlanViewSet(BaseModelViewSet):
     queryset = MembershipPlan.objects.all()
     serializer_class = MembershipPlanSerializer
-    permission_classes = [IsAuthenticated,IsStaffOrAdminAndReadOnly]
+    permission_classes = [IsStaffOrAdminAndReadOnly]
 
     # business logic
     
