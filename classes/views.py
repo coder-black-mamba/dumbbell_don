@@ -88,7 +88,7 @@ class BookingViewSet(BaseModelViewSet):
     
     # business logic
     def get_queryset(self):
-        if self.request.user.role == User.ADMIN:
+        if self.request.user and self.request.user.is_authenticated and self.request.user.role == User.ADMIN:
             return Booking.objects.all()
         return Booking.objects.filter(member=self.request.user)
     
@@ -174,7 +174,7 @@ class AttendanceViewSet(BaseModelViewSet):
         serializer.save(marked_by=self.request.user)
     
     def get_queryset(self): 
-        if self.request.user.role == User.ADMIN or self.request.user.role == User.STAFF:
+        if self.request.user and self.request.user.is_authenticated and self.request.user.role == User.ADMIN or self.request.user.role == User.STAFF:
             return Attendance.objects.all()
         return Attendance.objects.filter(booking__member=self.request.user)
 

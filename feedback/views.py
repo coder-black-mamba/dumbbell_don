@@ -16,11 +16,11 @@ class FeedbackViewSet(BaseModelViewSet):
     # core busineses logic
     
     def get_queryset(self):
-        if self.request.user.role == User.ADMIN:
+        if self.request.user.is_authenticated and self.request.user.role == User.ADMIN:
             return Feedback.objects.all()
-        if self.request.user.role == User.STAFF:
+        if self.request.user.is_authenticated and self.request.user.role == User.STAFF:
             return Feedback.objects.filter(fitness_class__instructor=self.request.user)
-        return Feedback.objects.filter()
+        return Feedback.objects.all()
     
     # def get_object(self):
     #     if self.request.user.role == User.ADMIN:
