@@ -27,7 +27,7 @@ class MembershipPlanViewSet(BaseModelViewSet):
     
     @swagger_auto_schema(
         operation_summary="List Membership Plans",
-        operation_description="List Membership Plans. Admin/Staff/Member sees all.",
+        operation_description="List Membership Plans. Admin/Staff/Member/anynymus user sees all.",
         responses={
             200:MembershipPlanSerializer(many=True),
             401:SwaggerErrorResponseSerializer,
@@ -38,7 +38,7 @@ class MembershipPlanViewSet(BaseModelViewSet):
         
     @swagger_auto_schema(
         operation_summary="Retrieve Membership Plan",
-        operation_description="Retrieve Membership Plan. Admin/Staff/Member sees all.",
+        operation_description="Retrieve Membership Plan. Admin/Staff/Member/anynymus user sees all.",
         responses={
             200:MembershipPlanSerializer,
             401:SwaggerErrorResponseSerializer,
@@ -80,14 +80,4 @@ class MembershipPlanViewSet(BaseModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)
     
-    @swagger_auto_schema(
-        operation_summary="List Membership Plans",
-        operation_description="List Membership Plans. Admin/Staff/Member sees all.",
-        responses={
-            200:MembershipPlanSerializer(many=True),
-            401:SwaggerErrorResponseSerializer,
-        }
-    )
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
         
