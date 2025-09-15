@@ -1,4 +1,8 @@
-# Dumbbell Don
+# To Be Fixed 
+### 1. Payment Intitialization Thing
+
+
+### Dumbbell Don
 
 Dumbbell Don is a comprehensive and robust gym management system designed to streamline operations for fitness centers. This powerful backend API is built with Django and Django REST Framework, providing a full suite of features to manage users, memberships, class schedules, payments, and more.
 

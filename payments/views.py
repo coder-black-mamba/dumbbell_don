@@ -14,6 +14,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.response import Response
 from core.serializers import SwaggerErrorResponseSerializer
+from decouple import config
 
 class InvoiceViewSet(BaseModelViewSet):
     
@@ -255,5 +256,117 @@ class PaymentViewSet(BaseModelViewSet):
         
 
 
+@swagger_auto_schema(
+    method='post',
+    operation_description="Initiate a payment session with SSLCommerz",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=['amount', 'orderId', 'numItems'],
+        properties={
+            'amount': openapi.Schema(type=openapi.TYPE_NUMBER, format='decimal', description='Payment amount'),
+            'orderId': openapi.Schema(type=openapi.TYPE_STRING, description='Order ID for the payment'),
+            'numItems': openapi.Schema(type=openapi.TYPE_INTEGER, description='Number of items in the order'),
+        },
+    ),
+    responses={
+        200: openapi.Response(
+            description='Payment initialization successful',
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'payment_url': openapi.Schema(type=openapi.TYPE_STRING, description='URL to redirect for payment')
+                }
+            )
+        ),
+        400: 'Invalid request data',
+        401: 'Authentication credentials were not provided',
+    }
+)
+@api_view(['POST'])
+def initiate_payment(request):
+    user = request.user
+    amount = request.data.get("amount")
+    order_id = request.data.get("orderId")
+    num_items = request.data.get("numItems")
 
+    settings = {'store_id': config('STORE_ID'),
+                'store_pass': config('STORE_PASSWORD'), 'issandbox': True}
+    sslcz = SSLCOMMERZ(settings)
+    post_body = {}
+    post_body['total_amount'] = amount
+    post_body['currency'] = "BDT"
+    post_body['tran_id'] = f"txn_{order_id}"
+    post_body['success_url'] = f"{main_settings.BACKEND_URL}/api/v1/payment/success/"
+    post_body['fail_url'] = f"{main_settings.BACKEND_URL}/api/v1/payment/fail/"
+    post_body['cancel_url'] = f"{main_settings.BACKEND_URL}/api/v1/payment/cancel/"
+    post_body['emi_option'] = 0
+    post_body['cus_name'] = f"{user.first_name} {user.last_name}"
+    post_body['cus_email'] = user.email
+    post_body['cus_phone'] = user.phone_number
+    post_body['cus_add1'] = user.address
+    post_body['cus_city'] = "Dhaka"
+    post_body['cus_country'] = "Bangladesh"
+    post_body['shipping_method'] = "Courier"
+    post_body['multi_card_name'] = ""
+    post_body['num_of_item'] = num_items
+    post_body['product_name'] = "E-commerce Products"
+    post_body['product_category'] = "General"
+    post_body['product_profile'] = "general"
+
+    response = sslcz.createSession(post_body)  # API response
+
+    if response.get("status") == 'SUCCESS':
+        return Response({"payment_url": response['GatewayPageURL']})
+    return Response({"error": "Payment initiation failed"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(
+    method='post',
+    operation_description="Handle successful payment callback from SSLCommerz",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'tran_id': openapi.Schema(type=openapi.TYPE_STRING, description='Transaction ID from SSLCommerz')
+        },
+        required=['tran_id']
+    ),
+    responses={
+        302: 'Redirects to frontend orders page on success',
+        400: 'Invalid transaction ID',
+        404: 'Order not found'
+    }
+)
+@api_view(['POST'])
+def payment_success(request):
+    print("Inside success")
+    order_id = request.data.get("tran_id").split('_')[1]
+    order = Order.objects.get(id=order_id)
+    order.status = "Ready To Ship"
+    order.save()
+    return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/dashboard/")
+
+
+@swagger_auto_schema(
+    method='post',
+    operation_description="Handle cancelled payment from SSLCommerz",
+    responses={
+        302: 'Redirects to frontend orders page'
+    }
+)
+@api_view(['POST'])
+def payment_cancel(request):
+    return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/dashboard/")
+
+
+@swagger_auto_schema(
+    method='post',
+    operation_description="Handle failed payment from SSLCommerz",
+    responses={
+        302: 'Redirects to frontend orders page'
+    }
+)
+@api_view(['POST'])
+def payment_fail(request):
+    print("Inside fail")
+    return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/dashboard/")
 

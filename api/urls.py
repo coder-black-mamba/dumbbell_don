@@ -32,6 +32,10 @@ urlpatterns += [
     path('auth/', include('djoser.urls.jwt')), 
     path('classes/', include('classes.urls')),
     path('reports/', include('reports.urls')),
+    path('payments/initiate/', initiate_payment),
+    path('payments/success/', success_payment),
+    path('payments/fail/', fail_payment),
+    path('payments/cancel/', cancel_payment),
 ]
 
 
