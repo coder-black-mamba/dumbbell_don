@@ -191,7 +191,8 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
 BACKEND_URL = config("BACKEND_URL")
 FRONTEND_URL = config("FRONTEND_URL")
-
+DOMAIN = "dumbell-don-client.vercel.app"
+SITE_NAME = "Dumbell Don"
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -214,8 +215,8 @@ SIMPLE_JWT = {
 DJOSER = {
     # 'PASSWORD_RESET_CONFIRM_URL': 'auth/password/reset/confirm/{uid}/{token}',
     # 'ACTIVATION_URL': 'auth/activate/{uid}/{token}',
-    "PASSWORD_RESET_CONFIRM_URL": f"{FRONTEND_URL}/reset-password/confirm/{{uid}}/{{token}}",
-    "ACTIVATION_URL": f"{FRONTEND_URL}/activate/{{uid}}/{{token}}",
+    "PASSWORD_RESET_CONFIRM_URL": "reset-password/confirm/{uid}/{token}",
+    "ACTIVATION_URL": "activate/{uid}/{token}",
     'SEND_ACTIVATION_EMAIL': True,
     'SEND_CONFIRMATION_EMAIL': True,
     'SERIALIZERS': {
