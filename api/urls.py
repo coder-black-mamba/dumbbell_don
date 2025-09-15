@@ -7,6 +7,7 @@ from classes.views import FitnessClassViewSet, BookingViewSet, AttendanceViewSet
 from feedback.views import FeedbackViewSet
 # from reports.views import MembershipReportViewSet, AttendanceReportViewSet, FeedbackReportViewSet, PaymentReportViewSet
 from users.views import UserViewSet
+from payments.views import initiate_payment, payment_success, payment_fail, payment_cancel
 router = DefaultRouter()
 
 router.register("membership-plans", MembershipPlanViewSet,basename="membership-plan")
@@ -32,10 +33,10 @@ urlpatterns += [
     path('auth/', include('djoser.urls.jwt')), 
     path('classes/', include('classes.urls')),
     path('reports/', include('reports.urls')),
-    path('payments/initiate/', initiate_payment),
-    path('payments/success/', success_payment),
-    path('payments/fail/', fail_payment),
-    path('payments/cancel/', cancel_payment),
+    path('payment/initiate/', initiate_payment),
+    path('payment/success/', payment_success),
+    path('payment/fail/', payment_fail),
+    path('payment/cancel/', payment_cancel),
 ]
 
 

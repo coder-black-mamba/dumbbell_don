@@ -8,13 +8,19 @@ from classes.models import Booking
 from rest_framework import status
 from core.utils.api_response import error_response
 from core.permissions import IsAdminOrSelf
+from django.conf import settings as main_settings
 import uuid
 from django.utils import timezone
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.response import Response
 from core.serializers import SwaggerErrorResponseSerializer
-from decouple import config
+from rest_framework.decorators import api_view
+from sslcommerz_lib import SSLCOMMERZ
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
+
+
 
 class InvoiceViewSet(BaseModelViewSet):
     
@@ -261,11 +267,9 @@ class PaymentViewSet(BaseModelViewSet):
     operation_description="Initiate a payment session with SSLCommerz",
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
-        required=['amount', 'orderId', 'numItems'],
+        required=['invoice_id'],
         properties={
-            'amount': openapi.Schema(type=openapi.TYPE_NUMBER, format='decimal', description='Payment amount'),
-            'orderId': openapi.Schema(type=openapi.TYPE_STRING, description='Order ID for the payment'),
-            'numItems': openapi.Schema(type=openapi.TYPE_INTEGER, description='Number of items in the order'),
+            'invoice_id': openapi.Schema(type=openapi.TYPE_STRING, description='Invoice ID for the payment'),
         },
     ),
     responses={
@@ -282,42 +286,74 @@ class PaymentViewSet(BaseModelViewSet):
         401: 'Authentication credentials were not provided',
     }
 )
+
 @api_view(['POST'])
+@login_required
 def initiate_payment(request):
-    user = request.user
-    amount = request.data.get("amount")
-    order_id = request.data.get("orderId")
-    num_items = request.data.get("numItems")
+    try:
+        user = request.user
+        invoice_id = request.data.get("invoice_id")
+        invoice = Invoice.objects.get(number=invoice_id)
+        
+        # check if invoice is already paid
+        if invoice.status == 'PAID':
+            return Response({'error': 'Invoice already paid'}, status=status.HTTP_400_BAD_REQUEST)
+        
 
-    settings = {'store_id': config('STORE_ID'),
-                'store_pass': config('STORE_PASSWORD'), 'issandbox': True}
-    sslcz = SSLCOMMERZ(settings)
-    post_body = {}
-    post_body['total_amount'] = amount
-    post_body['currency'] = "BDT"
-    post_body['tran_id'] = f"txn_{order_id}"
-    post_body['success_url'] = f"{main_settings.BACKEND_URL}/api/v1/payment/success/"
-    post_body['fail_url'] = f"{main_settings.BACKEND_URL}/api/v1/payment/fail/"
-    post_body['cancel_url'] = f"{main_settings.BACKEND_URL}/api/v1/payment/cancel/"
-    post_body['emi_option'] = 0
-    post_body['cus_name'] = f"{user.first_name} {user.last_name}"
-    post_body['cus_email'] = user.email
-    post_body['cus_phone'] = user.phone_number
-    post_body['cus_add1'] = user.address
-    post_body['cus_city'] = "Dhaka"
-    post_body['cus_country'] = "Bangladesh"
-    post_body['shipping_method'] = "Courier"
-    post_body['multi_card_name'] = ""
-    post_body['num_of_item'] = num_items
-    post_body['product_name'] = "E-commerce Products"
-    post_body['product_category'] = "General"
-    post_body['product_profile'] = "general"
+        # create a payment iobject also 
+        payment = Payment.objects.create(
+            invoice=invoice,
+            member=user,
+            amount_cents=invoice.total_cents,
+            currency="USD",
+            status="PENDING",
+            reference=str(uuid.uuid4()),
+            metadata={"invoice": str(invoice.number),"payment_type": invoice.metadata.get('payment_type'),"booking_id": invoice.metadata.get('booking_id')}
+        )
+    
 
-    response = sslcz.createSession(post_body)  # API response
+        amount = invoice.total_cents
 
-    if response.get("status") == 'SUCCESS':
-        return Response({"payment_url": response['GatewayPageURL']})
-    return Response({"error": "Payment initiation failed"}, status=status.HTTP_400_BAD_REQUEST)
+        settings = {'store_id': main_settings.STORE_ID,
+                    'store_pass': main_settings.STORE_PASSWORD, 'issandbox': True}
+        sslcz = SSLCOMMERZ(settings)
+        post_body = {}
+        post_body['total_amount'] = amount/100
+        post_body['currency'] = "USD"
+        post_body['tran_id'] = f"txn_{invoice.number}"
+        post_body['success_url'] = f"{main_settings.BACKEND_URL}/api/v1/payment/success/"
+        post_body['fail_url'] = f"{main_settings.BACKEND_URL}/api/v1/payment/fail/"
+        post_body['cancel_url'] = f"{main_settings.BACKEND_URL}/api/v1/payment/cancel/"
+        post_body['emi_option'] = 0
+        post_body['cus_name'] = f"{user.first_name} {user.last_name}"
+        post_body['cus_email'] = user.email
+        post_body['cus_phone'] ="+8801717963289"
+        post_body['cus_add1'] = user.address if user.address else "Dhaka"
+        post_body['cus_city'] = "Dhaka"
+        post_body['cus_country'] = "Bangladesh"
+        post_body['shipping_method'] = "NO"
+        post_body['multi_card_name'] = ""
+        post_body['num_of_item'] = 1
+        post_body['product_name'] = "E-commerce Products"
+        post_body['product_category'] = "General"
+        post_body['product_profile'] = "general"
+        post_body['ship_name'] = f"{user.first_name} {user.last_name}"
+        post_body['ship_email'] = user.email
+        post_body['ship_add1'] = user.address if user.address else "Dhaka"
+        post_body['ship_city'] = "Dhaka"
+        post_body['ship_country'] = "Bangladesh"
+        post_body['ship_phone'] = "+8801717963289"
+        post_body['ship_postcode'] = "1207"
+
+        response = sslcz.createSession(post_body)  # API response
+        print(response)
+        if response.get("status") == 'SUCCESS':
+            return Response({"payment_url": response['GatewayPageURL']})
+        return Response({"error": "Payment initiation failed"}, status=status.HTTP_400_BAD_REQUEST)
+        
+    except Exception as e:
+        print(e)
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
@@ -331,42 +367,58 @@ def initiate_payment(request):
         required=['tran_id']
     ),
     responses={
-        302: 'Redirects to frontend orders page on success',
+        302: 'Redirects to frontend dashboard page on success',
         400: 'Invalid transaction ID',
-        404: 'Order not found'
+        404: 'Invoice not found'
     }
 )
 @api_view(['POST'])
 def payment_success(request):
     print("Inside success")
-    order_id = request.data.get("tran_id").split('_')[1]
-    order = Order.objects.get(id=order_id)
-    order.status = "Ready To Ship"
-    order.save()
-    return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/dashboard/")
+    try:
+        invoice_id = request.data.get("tran_id").split('_')[1]
+        invoice = Invoice.objects.get(number=invoice_id)
+        invoice.status = "PAID"
+        invoice.save()
+        payment = Payment.objects.get(invoice=invoice)
+        payment.status = "PAID"
+        payment.save()
+        print("Payment success",f"{main_settings.FRONTEND_URL}/dashboard/")
+        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/dashboard/")
+    except Exception as e:
+        print(e)
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
     method='post',
     operation_description="Handle cancelled payment from SSLCommerz",
     responses={
-        302: 'Redirects to frontend orders page'
+        302: 'Redirects to frontend dashboard page'
     }
 )
 @api_view(['POST'])
 def payment_cancel(request):
-    return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/dashboard/")
+    try:
+        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/dashboard/")
+    except Exception as e:
+        print(e)
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
     method='post',
     operation_description="Handle failed payment from SSLCommerz",
     responses={
-        302: 'Redirects to frontend orders page'
+        302: 'Redirects to frontend dashboard page'
     }
 )
 @api_view(['POST'])
 def payment_fail(request):
-    print("Inside fail")
-    return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/dashboard/")
+    try:
+        print("Inside fail")
+        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/dashboard/")
+    except Exception as e:
+        print(e)
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
