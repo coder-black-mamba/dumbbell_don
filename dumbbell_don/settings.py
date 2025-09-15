@@ -33,6 +33,7 @@ SECRET_KEY = "django-insecure-==&+^d*3_s6)i0u&t(@sqbbu*1d_jt_cwu1$s*)q%-mwiepe5$
 DEBUG = True  # Make sure DEBUG is True for development
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", ".vercel.app"]
+CORS_ALLOW_ALL_ORIGINS = True
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -62,6 +63,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "drf_yasg",
     "djoser",
     "rest_framework",
@@ -82,6 +84,7 @@ INSTALLED_APPS = [
 # SITE_ID = 1
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
