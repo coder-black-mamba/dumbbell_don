@@ -346,7 +346,7 @@ def initiate_payment(request):
         post_body['ship_postcode'] = "1207"
 
         response = sslcz.createSession(post_body)  # API response
-        print(response)
+        # print(response)
         if response.get("status") == 'SUCCESS':
             return Response({"payment_url": response['GatewayPageURL']})
         return Response({"error": "Payment initiation failed"}, status=status.HTTP_400_BAD_REQUEST)
@@ -383,8 +383,8 @@ def payment_success(request):
         payment = Payment.objects.get(invoice=invoice)
         payment.status = "PAID"
         payment.save()
-        print("Payment success",f"{main_settings.FRONTEND_URL}/dashboard/")
-        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/dashboard/")
+        # print("Payment success",f"{main_settings.FRONTEND_URL}/payment-success/")
+        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment-success/")
     except Exception as e:
         print(e)
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -400,7 +400,7 @@ def payment_success(request):
 @api_view(['POST'])
 def payment_cancel(request):
     try:
-        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/dashboard/")
+        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment-cancel/")
     except Exception as e:
         print(e)
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -417,7 +417,7 @@ def payment_cancel(request):
 def payment_fail(request):
     try:
         print("Inside fail")
-        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/dashboard/")
+        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment-fail/")
     except Exception as e:
         print(e)
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
