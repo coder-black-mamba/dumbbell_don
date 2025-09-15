@@ -189,6 +189,9 @@ EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
+BACKEND_URL = config("BACKEND_URL")
+FRONTEND_URL = config("FRONTEND_URL")
+
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -209,15 +212,16 @@ SIMPLE_JWT = {
 }
 
 DJOSER = {
-    'PASSWORD_RESET_CONFIRM_URL': 'auth/password/reset/confirm/{uid}/{token}',
-    'ACTIVATION_URL': 'auth/activate/{uid}/{token}',
+    # 'PASSWORD_RESET_CONFIRM_URL': 'auth/password/reset/confirm/{uid}/{token}',
+    # 'ACTIVATION_URL': 'auth/activate/{uid}/{token}',
+    "PASSWORD_RESET_CONFIRM_URL": f"{FRONTEND_URL}/reset-password/confirm/{{uid}}/{{token}}",
+    "ACTIVATION_URL": f"{FRONTEND_URL}/activate/{{uid}}/{{token}}",
     'SEND_ACTIVATION_EMAIL': True,
     'SEND_CONFIRMATION_EMAIL': True,
     'SERIALIZERS': {
         'user_create': 'users.serializers.UserCreateSerializer',
         'current_user': 'users.serializers.UserSerializer'
     },
-    'PASSWORD_RESET_CONFIRM_URL': 'auth/password/reset/confirm/{uid}/{token}',
 }
 
 
@@ -235,8 +239,7 @@ REST_FRAMEWORK = {
 }
 
 
-BACKEND_URL = config("BACKEND_URL")
-FRONTEND_URL = config("FRONTEND_URL")
+
 
 STORE_ID = config("STORE_ID")
 STORE_PASSWORD = config("STORE_PASSWORD")
