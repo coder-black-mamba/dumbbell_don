@@ -424,7 +424,7 @@ def payment_success(request):
             subscription.save()
         
         # print("Payment success",f"{main_settings.FRONTEND_URL}/payment-success/")
-        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment/success/")
+        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment/success/{payment.id}")
     except Exception as e:
         print(e)
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
