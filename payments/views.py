@@ -414,9 +414,14 @@ def payment_success(request):
         payment.status = "PAID"
         payment.save()
 
-        booking = Booking.objects.get(id=invoice.metadata.get('booking_id'))
-        booking.status = "BOOKED"
-        booking.save()
+        if invoice.metadata.get('payment_type') == 'booking':
+            booking = Booking.objects.get(id=invoice.metadata.get('booking_id'))
+            booking.status = "BOOKED"
+            booking.save()
+        elif invoice.metadata.get('payment_type') == 'subscription':
+            subscription = Subscription.objects.get(id=invoice.metadata.get('subscription_id'))
+            subscription.status = "ACTIVE"
+            subscription.save()
         
         # print("Payment success",f"{main_settings.FRONTEND_URL}/payment-success/")
         return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment/success/")
