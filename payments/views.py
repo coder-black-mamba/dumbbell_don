@@ -384,7 +384,7 @@ def payment_success(request):
         payment.status = "PAID"
         payment.save()
         # print("Payment success",f"{main_settings.FRONTEND_URL}/payment-success/")
-        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment-success/")
+        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment/success/")
     except Exception as e:
         print(e)
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -400,7 +400,7 @@ def payment_success(request):
 @api_view(['POST'])
 def payment_cancel(request):
     try:
-        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment-cancel/")
+        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment/cancel/")
     except Exception as e:
         print(e)
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -417,7 +417,7 @@ def payment_cancel(request):
 def payment_fail(request):
     try:
         print("Inside fail")
-        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment-fail/")
+        return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment/fail/")
     except Exception as e:
         print(e)
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
