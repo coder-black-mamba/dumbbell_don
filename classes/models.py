@@ -25,7 +25,7 @@ class Booking(models.Model):
     )
     member = models.ForeignKey('users.User', on_delete=models.CASCADE)
     fitness_class = models.ForeignKey(FitnessClass, on_delete=models.CASCADE)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='BOOKED')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='NO_SHOW')
     booked_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

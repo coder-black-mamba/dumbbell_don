@@ -322,6 +322,7 @@ def initiate_payment(request):
     try:
         user = request.user
         invoice_id = request.data.get("invoice_id")
+        print("Invoice ID:", invoice_id)
         invoice = Invoice.objects.get(number=invoice_id)
         
         # check if invoice is already paid
