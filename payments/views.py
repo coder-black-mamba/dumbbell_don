@@ -413,6 +413,11 @@ def payment_success(request):
         payment = Payment.objects.get(invoice=invoice)
         payment.status = "PAID"
         payment.save()
+
+        booking = Booking.objects.get(id=invoice.metadata.get('booking_id'))
+        booking.status = "BOOKED"
+        booking.save()
+        
         # print("Payment success",f"{main_settings.FRONTEND_URL}/payment-success/")
         return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment/success/")
     except Exception as e:
