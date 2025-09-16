@@ -412,6 +412,8 @@ def payment_success(request):
         invoice.save()
         payment = Payment.objects.get(invoice=invoice)
         payment.status = "PAID"
+        payment.paid_at = timezone.now()
+        payment.reference = request.data.get("tran_id")
         payment.save()
 
         if invoice.metadata.get('payment_type') == 'booking':
