@@ -34,21 +34,50 @@ class InvoiceViewSet(BaseModelViewSet):
         return Invoice.objects.filter(member=self.request.user)
     # business logic
     def perform_create(self, serializer):
-
-        payment_type=self.request.query_params.get('payment_type')
-        id=self.request.query_params.get('id')
-        
-        if payment_type == 'subscription':
-            subscription_data = Subscription.objects.get(member=self.request.user, id=id)
-            metadata={"subscription": str(subscription_data.plan),"payment_type": "subscription","subscription_id": subscription_data.id}
-
-            serializer.save(member=self.request.user, total_cents=subscription_data.plan.price_cents, metadata=metadata)
-        elif payment_type == 'booking':
-            booking_data = Booking.objects.get(id=id)
-            metadata={"booking": str(booking_data),"payment_type": "booking","booking_id": booking_data.id}
-            serializer.save(member=self.request.user, total_cents=booking_data.fitness_class.price_cents, metadata=metadata)
-        else:
-            serializer.save(member=self.request.user, total_cents=0, metadata={"other": "Empty Invoice"})
+        try:
+            payment_type = self.request.query_params.get('payment_type')
+            id = self.request.query_params.get('id')
+            
+            if not payment_type or not id:
+                raise ValidationError({"error": "Both 'payment_type' and 'id' query parameters are required"})
+                
+            if payment_type == 'subscription':
+                try:
+                    subscription_data = Subscription.objects.get(member=self.request.user, id=id)
+                    metadata = {
+                        "subscription": str(subscription_data.plan),
+                        "payment_type": "subscription",
+                        "subscription_id": subscription_data.id
+                    }
+                    serializer.save(
+                        member=self.request.user, 
+                        total_cents=subscription_data.plan.price_cents, 
+                        metadata=metadata
+                    )
+                except Subscription.DoesNotExist:
+                    raise ValidationError({"error": "Subscription not found or you don't have permission to access it"})
+                    
+            elif payment_type == 'booking':
+                try:
+                    booking_data = Booking.objects.get(id=id, member=self.request.user)
+                    metadata = {
+                        "booking": str(booking_data),
+                        "payment_type": "booking",
+                        "booking_id": booking_data.id
+                    }
+                    serializer.save(
+                        member=self.request.user, 
+                        total_cents=booking_data.fitness_class.price_cents, 
+                        metadata=metadata
+                    )
+                except Booking.DoesNotExist:
+                    raise ValidationError({"error": "Booking not found or you don't have permission to access it"})
+            else:
+                raise ValidationError({"error": "Invalid payment_type. Must be either 'subscription' or 'booking'"})
+                
+        except Exception as e:
+            print(f"Error creating invoice: {str(e)}")
+            raise ValidationError({"error": str(e)})
 
     # swagger doc
     @swagger_auto_schema(

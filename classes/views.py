@@ -5,6 +5,7 @@ from .serializers import FitnessClassSerializer, BookingSerializer, AttendanceSe
 from .permissions import BookingPermission, IsStaffOrAdminAndReadOnly , IsStuffOrSelfOrReadOnly
 from rest_framework.decorators import permission_classes,api_view
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 from classes.models import Booking,Attendance  
 from users.models import User
 from core.serializers import SwaggerErrorResponseSerializer,SwaggerSuccessListResponseSerializer
@@ -93,7 +94,31 @@ class BookingViewSet(BaseModelViewSet):
         return Booking.objects.filter(member=self.request.user)
     
     def perform_create(self, serializer):
-        serializer.save(member=self.request.user)
+        
+        # Create invoice for the booking
+        from payments.models import Invoice
+        from django.utils import timezone
+        from django.db import transaction
+        
+        try:
+            booking = serializer.save(member=self.request.user)
+            # with transaction.atomic():
+            #     invoice = Invoice.objects.create(
+            #         member=self.request.user,
+            #         total_cents=booking.fitness_class.price_cents,
+            #         due_date=timezone.now() + timezone.timedelta(days=7),  # 7 days from now
+            #         status='UNPAID',
+            #         metadata={
+            #             'booking_id': str(booking.id),
+            #             'fitness_class': str(booking.fitness_class.title),
+            #             'payment_type': 'booking'
+            #         }
+            #     )
+                # You might want to add more fields to the invoice as needed
+        except Exception as e:
+            # If invoice creation fails, delete the booking to maintain consistency
+            booking.delete()
+            raise ValidationError({'error': f'Failed to create invoice: {str(e)}'})
 
     # for swagger documentation
     @swagger_auto_schema(
