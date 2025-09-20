@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import FitnessClass, Booking, Attendance
+from .models import FitnessClass, Booking, Attendance, FitnessClass
 from users.models import User
+from users.serializers import UserSimpleSerializer
 
 class FitnessClassSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,6 +11,7 @@ class FitnessClassSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
+    fitness_class = FitnessClassSerializer(read_only=True)
     class Meta:
         model = Booking
         fields = ['id', 'member', 'fitness_class', 'status','booked_at']
