@@ -50,14 +50,14 @@ class MemberFitnessClassSerializer(serializers.ModelSerializer):
     instructor = MemberInstructorSerializer(read_only=True)
     class Meta:
         model = FitnessClass
-        fields = ['title', 'description', 'instructor']
+        fields = ['title', 'description', 'instructor','start_datetime','end_datetime']
 
 
 class MemberBookingSerializer(serializers.ModelSerializer):
     class_data = MemberFitnessClassSerializer(source='fitness_class', read_only=True)
     class Meta:
         model = Booking
-        fields = ['member','class_data'] 
+        fields = ['member','class_data','fitness_class','status','booked_at'] 
 
 
 class MemberAttendanceSerializer(serializers.ModelSerializer):
