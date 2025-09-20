@@ -11,7 +11,6 @@ class FitnessClassSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    fitness_class = FitnessClassSerializer(read_only=True)
     class Meta:
         model = Booking
         fields = ['id', 'member', 'fitness_class', 'status','booked_at']
