@@ -16,11 +16,35 @@ class BookingSerializer(serializers.ModelSerializer):
     member = UserSimpleSerializer(read_only=True)
     fitness_class = FitnessClassSerializer(read_only=True)
 
+    # Extra write-only fields for creation
+    member_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        source="member",
+        write_only=True
+    )
+    fitness_class_id = serializers.PrimaryKeyRelatedField(
+        queryset=FitnessClass.objects.all(),
+        source="fitness_class",
+        write_only=True
+    )
+
     class Meta:
         model = Booking
-        fields = ['id', 'member', 'fitness_class', 'status','booked_at','status']
-        read_only_fields = ['id', 'created_at', 'updated_at','member','booked_at']
+        fields = [
+            'id', 
+            'member', 
+            'fitness_class', 
+            'status', 
+            'booked_at',
+            'member_id',      # for input
+            'fitness_class_id' # for input
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'booked_at']
 
+    def create(self, validated_data):
+        # member and fitness_class will already be resolved by PrimaryKeyRelatedField
+        booking = Booking.objects.create(**validated_data)
+        return booking
 
 class AttendanceSerializer(serializers.ModelSerializer):
     booking_data = BookingSerializer(source='booking', read_only=True)
