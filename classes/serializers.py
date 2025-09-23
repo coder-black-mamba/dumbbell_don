@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import FitnessClass, Booking, Attendance, FitnessClass
 from users.models import User
 from users.serializers import UserSimpleSerializer
+from django.db import transaction
+from rest_framework.exceptions import ValidationError
 
 class FitnessClassSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,10 +13,13 @@ class FitnessClassSerializer(serializers.ModelSerializer):
 
 
 class BookingSerializer(serializers.ModelSerializer):
+    member = UserSimpleSerializer(read_only=True)
+    fitness_class = FitnessClassSerializer(read_only=True)
+
     class Meta:
         model = Booking
-        fields = ['id', 'member', 'fitness_class', 'status','booked_at']
-        read_only_fields = ['id', 'created_at', 'updated_at','member','booked_at','status']
+        fields = ['id', 'member', 'fitness_class', 'status','booked_at','status']
+        read_only_fields = ['id', 'created_at', 'updated_at','member','booked_at']
 
 
 class AttendanceSerializer(serializers.ModelSerializer):
@@ -61,8 +66,6 @@ class MemberBookingSerializer(serializers.ModelSerializer):
         fields = ['member','class_data','fitness_class','status','booked_at'] 
 
 
-from django.db import transaction
-from rest_framework.exceptions import ValidationError
 
 class MemberAttendanceSerializer(serializers.ModelSerializer):
     booking_data = MemberBookingSerializer(source='booking', read_only=True)
