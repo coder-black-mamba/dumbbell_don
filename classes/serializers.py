@@ -48,11 +48,33 @@ class BookingSerializer(serializers.ModelSerializer):
 
 class AttendanceSerializer(serializers.ModelSerializer):
     booking_data = BookingSerializer(source='booking', read_only=True)
+    booking_id = serializers.PrimaryKeyRelatedField(
+        queryset=Booking.objects.all(),
+        source="booking",
+        write_only=True
+    )
+
     class Meta:
         model = Attendance
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at','marked_by','marked_at','booking_data','fitness_class']
-    
+        fields = [
+            'id',
+            'present',
+            'booking_id',   # write-only field for POST
+            'booking_data', # nested read-only details
+            'marked_by',
+            'marked_at',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = [
+            'id',
+            'created_at',
+            'updated_at',
+            'marked_by',
+            'marked_at',
+            'booking_data'
+        ]
+
 class ScheduleInstructorSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
