@@ -62,14 +62,10 @@ class AttendanceSerializer(serializers.ModelSerializer):
             'booking_id',   # write-only field for POST
             'booking_data', # nested read-only details
             'marked_by',
-            'marked_at',
-            'created_at',
-            'updated_at',
+            'marked_at', 
         ]
         read_only_fields = [
             'id',
-            'created_at',
-            'updated_at',
             'marked_by',
             'marked_at',
             'booking_data'

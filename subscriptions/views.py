@@ -11,12 +11,16 @@ from core.serializers import SwaggerErrorResponseSerializer
 class SubscriptionViewSet(BaseModelViewSet): 
     serializer_class = SubscriptionSerializer
     permission_classes = [IsAuthenticated, IsSubscriptionOwner]
-    # business logic
+    
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            # Return empty queryset for schema generation
+            return Subscription.objects.none()
         return Subscription.objects.filter(member=self.request.user)
     
     def perform_create(self, serializer):
-        serializer.save(member=self.request.user)
+        if not getattr(self, 'swagger_fake_view', False):
+            serializer.save(member=self.request.user)
 
     # swagger doc
     @swagger_auto_schema(
