@@ -15,7 +15,8 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.response import Response
 from core.serializers import SwaggerErrorResponseSerializer
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from sslcommerz_lib import SSLCOMMERZ
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -400,9 +401,11 @@ def initiate_payment(request):
         302: 'Redirects to frontend dashboard page on success',
         400: 'Invalid transaction ID',
         404: 'Invoice not found'
-    }
+    },
+    security=[]  # No authentication required for this endpoint
 )
 @api_view(['POST'])
+@permission_classes([AllowAny])  # Allow unauthenticated access for payment callbacks
 def payment_success(request):
     print("Inside success")
     try:
@@ -437,9 +440,11 @@ def payment_success(request):
     operation_description="Handle cancelled payment from SSLCommerz",
     responses={
         302: 'Redirects to frontend dashboard page'
-    }
+    },
+    security=[]  # No authentication required for this endpoint
 )
 @api_view(['POST'])
+@permission_classes([AllowAny])  # Allow unauthenticated access for payment callbacks
 def payment_cancel(request):
     try:
         return HttpResponseRedirect(f"{main_settings.FRONTEND_URL}/payment/cancel/")
@@ -453,9 +458,11 @@ def payment_cancel(request):
     operation_description="Handle failed payment from SSLCommerz",
     responses={
         302: 'Redirects to frontend dashboard page'
-    }
+    },
+    security=[]  # No authentication required for this endpoint
 )
 @api_view(['POST'])
+@permission_classes([AllowAny])  # Allow unauthenticated access for payment callbacks
 def payment_fail(request):
     try:
         print("Inside fail")
