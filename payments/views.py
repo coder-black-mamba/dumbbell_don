@@ -348,33 +348,42 @@ def initiate_payment(request):
         settings = {'store_id': main_settings.STORE_ID,
                     'store_pass': main_settings.STORE_PASSWORD, 'issandbox': True}
         sslcz = SSLCOMMERZ(settings)
-        post_body = {}
-        post_body['total_amount'] = amount/100
-        post_body['currency'] = "USD"
-        post_body['tran_id'] = f"txn_{invoice.number}"
-        post_body['success_url'] = f"{main_settings.BACKEND_URL}/api/v1/payment/success/"
-        post_body['fail_url'] = f"{main_settings.BACKEND_URL}/api/v1/payment/fail/"
-        post_body['cancel_url'] = f"{main_settings.BACKEND_URL}/api/v1/payment/cancel/"
-        post_body['emi_option'] = 0
-        post_body['cus_name'] = f"{user.first_name} {user.last_name}"
-        post_body['cus_email'] = user.email
-        post_body['cus_phone'] ="+8801717963289"
-        post_body['cus_add1'] = user.address if user.address else "Dhaka"
-        post_body['cus_city'] = "Dhaka"
-        post_body['cus_country'] = "Bangladesh"
-        post_body['shipping_method'] = "NO"
-        post_body['multi_card_name'] = ""
-        post_body['num_of_item'] = 1
-        post_body['product_name'] = "E-commerce Products"
-        post_body['product_category'] = "General"
-        post_body['product_profile'] = "general"
-        post_body['ship_name'] = f"{user.first_name} {user.last_name}"
-        post_body['ship_email'] = user.email
-        post_body['ship_add1'] = user.address if user.address else "Dhaka"
-        post_body['ship_city'] = "Dhaka"
-        post_body['ship_country'] = "Bangladesh"
-        post_body['ship_phone'] = "+8801717963289"
-        post_body['ship_postcode'] = "1207"
+        # Get form data from request
+        form_data = request.data.get('formData', {})
+        same_as_billing = form_data.get('sameAsBilling', True)
+        
+        # Get product/class name from invoice metadata or use a default
+        product_name = invoice.metadata.get('name', 'Fitness Class')
+        
+        # Prepare the payment request body
+        post_body = {
+            'total_amount': amount/100,
+            'currency': "USD",
+            'tran_id': f"txn_{invoice.number}",
+            'success_url': f"{main_settings.BACKEND_URL}/api/v1/payment/success/",
+            'fail_url': f"{main_settings.BACKEND_URL}/api/v1/payment/fail/",
+            'cancel_url': f"{main_settings.BACKEND_URL}/api/v1/payment/cancel/",
+            'emi_option': 1,
+            'cus_name': form_data.get('cus_name', f"{user.first_name} {user.last_name}"),
+            'cus_email': user.email,
+            'cus_phone': form_data.get('cus_phone', user.phone_number or "+8801717963289"),
+            'cus_add1': form_data.get('cus_add1', user.address or "Dhaka"),
+            'cus_city': form_data.get('cus_city', "Dhaka"),
+            'cus_country': form_data.get('cus_country', "Bangladesh"),
+            'shipping_method': "NO",
+            'multi_card_name': "",
+            'num_of_item': 1,
+            'product_name': f"Fitness Class: {product_name}",
+            'product_category': "Fitness",
+            'product_profile': "physical-goods",
+            'ship_name': form_data.get('ship_name', f"{user.first_name} {user.last_name}") if not same_as_billing else form_data.get('cus_name', f"{user.first_name} {user.last_name}"),
+            'ship_email': user.email,
+            'ship_add1': form_data.get('ship_add1', user.address or "Dhaka") if not same_as_billing else form_data.get('cus_add1', user.address or "Dhaka"),
+            'ship_city': form_data.get('ship_city', "Dhaka") if not same_as_billing else form_data.get('cus_city', "Dhaka"),
+            'ship_country': form_data.get('ship_country', "Bangladesh") if not same_as_billing else form_data.get('cus_country', "Bangladesh"),
+            'ship_phone': form_data.get('ship_phone', user.phone_number or "+8801717963289") if not same_as_billing else form_data.get('cus_phone', user.phone_number or "+8801717963289"),
+            'ship_postcode': form_data.get('ship_postcode', '1207') if not same_as_billing else '1207'
+        }
 
         response = sslcz.createSession(post_body)  # API response
         # print(response)
