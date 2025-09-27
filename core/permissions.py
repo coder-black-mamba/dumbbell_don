@@ -45,13 +45,11 @@ class IsStuffOrReadOnly(BasePermission):
 
 
 class IsAdminOrSelf(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return obj.member == request.user or request.user.role == User.ADMIN
-
     def has_permission(self, request, view):
-        if request.method in SAFE_METHODS:
-            return True
-        if request.method == 'POST':
-            return True
-        return False
-    
+        # Allow all authenticated users to access the view
+        # Object-level permissions will be checked in has_object_permission
+        return request.user and request.user.is_authenticated
+        
+    def has_object_permission(self, request, view, obj):
+        # Allow if user is admin or the owner of the object
+        return obj.member == request.user or request.user.role == User.ADMIN
